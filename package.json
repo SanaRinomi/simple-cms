@@ -1,0 +1,24 @@
+{
+  "name": "simple-cms",
+  "version": "1.0.0",
+  "description": "A simple CMS built on stream",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "nodemon ./src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SanaRinomi/simple-cms.git"
+  },
+  "keywords": [
+    "cms",
+    "stream",
+    "simple"
+  ],
+  "author": "Amelia Rose Aldridge",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/SanaRinomi/simple-cms/issues"
+  },
+  "homepage": "https://github.com/SanaRinomi/simple-cms#readme"
+}
