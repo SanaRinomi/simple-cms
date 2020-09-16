@@ -1,0 +1,18 @@
+{
+    "url": "sana.codes",
+    "name": "Sana Portfolio",
+    "db": {
+        "client": "pg",
+        "connection": {
+            "host": "127.0.0.1",
+            "user": "user",
+            "password": "password",
+            "database": "database"
+        }
+    },
+    "author": "Amelia Rose Aldridge (Sana Rinomi)",
+    "secret": "cats",
+    "port": 8080,
+    "proxy": false,
+    "secure": true
+}

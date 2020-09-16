@@ -20,5 +20,15 @@
   "bugs": {
     "url": "https://github.com/SanaRinomi/simple-cms/issues"
   },
-  "homepage": "https://github.com/SanaRinomi/simple-cms#readme"
+  "homepage": "https://github.com/SanaRinomi/simple-cms#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "connect-session-knex": "^2.0.0",
+    "express": "^4.17.1",
+    "express-handlebars": "^5.1.0",
+    "express-session": "^1.17.1",
+    "knex": "^0.21.5",
+    "pg": "^8.3.3",
+    "smol-flash": "^1.0.0"
+  }
 }

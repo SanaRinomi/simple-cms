@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {{>head}}
+</head>
+<body>
+    {{#if flash}}
+    <div id="l-flash" class="center container {{#if flash.error}}bkg-red{{else}}bkg-green{{/if}}"><h4 class="e-text e-text--center">{{{flash.description}}}</i></h4><i class="fas fa-times-circle close-elem" hide="l-flash"></i></div>
+    {{/if}}
+
+    {{!-- <header id="l-header">
+        {{> header}}
+    </header> --}}
+
+    <div id="l-content">
+        {{{body}}}
+    </div>
+
+    {{!-- <footer id="l-footer">
+        {{> footer}}
+    </footer> --}}
+
+    {{!-- {{> scripts}} --}}
+</body>
+</html>
