@@ -14,3 +14,5 @@ We added in the tables we'll need into our code.
 ### Explanation on Slugs:
 Slugs make names that work better for URLs.
 Example: Sana Rinomi => sana_rinomi
+
+We created a basic authentication class and started adding in register and DB functions.
