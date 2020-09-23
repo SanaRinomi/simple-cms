@@ -29,6 +29,13 @@ class DBTable {
         else return false;
     }
 
+    async find(name, value) {
+        let obj = {};
+        obj[name] = value;
+        let res = await pg.from(this._name).select().where(obj);
+        return res.length && res[0] ? true : false;
+    }
+
     async get(id, data, returnArray = false) {
         let res = await pg.from(this._name).select(data).where(typeof id === "object" ? id : {id});
         if(res.length && res[0])
@@ -44,7 +51,8 @@ class DBTable {
     }
 
     async upsert(id, data = {}) {
-        let res = await pg.from(this._name).select(!this._generatedID && typeof id === "object" ? Object.keys(id) : ["id"]).where(typeof id === "object" ? id : {id});
+        let res;
+        if(id !== null) res = await pg.from(this._name).select(!this._generatedID && typeof id === "object" ? Object.keys(id) : ["id"]).where(typeof id === "object" ? id : {id});
 
         for (const key in data) {
             if (data.hasOwnProperty(key)) {
@@ -54,14 +62,14 @@ class DBTable {
             }
         }
 
-        if(res.length && res[0]) {
+        if(res && res.length && res[0]) {
             res = await pg(this._name).where(!this._generatedID ? typeof id === "object" ? id : {id} : {id: res[0].id}).update(data, typeof id === "object" ? Object.keys(id) : ["id"]);
         } else {
             res = await pg(this._name).returning(!this._generatedID && typeof id === "object" ? Object.keys(id) : ["id"]).insert(id ? typeof id === "object" ? {...id, ...data} : {id, ...data} : data);
         }
 
         if(Array.isArray(res) && res.length)
-            return {success: true, data: res};
+            return {success: true, data: res[0]};
         else return {success: false};
     }
 

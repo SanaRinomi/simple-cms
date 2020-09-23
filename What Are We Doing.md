@@ -11,8 +11,15 @@ We added in a config template and installed express.
 ## 16th of September 2020
 We added in the tables we'll need into our code.
 
+We created a basic authentication class and started adding in register and DB functions.
+
 ### Explanation on Slugs:
 Slugs make names that work better for URLs.
 Example: Sana Rinomi => sana_rinomi
 
-We created a basic authentication class and started adding in register and DB functions.
+## 21st of September 2020
+Fleshed out the local auth class (no testing as of right now)
+
+## 23rd of September 2020
+Test and debug the auth and local auth classes.
+They are now fully functional, allowing for: Registering, Login, Logout, Serialization and Deserialization.

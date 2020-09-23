@@ -1,5 +1,6 @@
 const CryptoJS = require("crypto-js");
 const flash = require("smol-flash");
+const { validationResult } = require('express-validator');
 
 class Configuration {
     constructor(data = {
@@ -36,9 +37,9 @@ class CheckConfig extends Configuration {
         super({
             redirectSuccess: null,
             redirectFailure: null,
-            required: true,
             ...data
         }, res, req, next);
+        this.required = data.required || data.required === undefined ? true : false;
     }
 }
 
@@ -56,7 +57,7 @@ class Authentication {
     }) {
         return async (req, res, next) => {
             const _config = new Configuration(config, res, req, next);
-            const id = req.session.id;
+            const id = req.session.user_id;
             if(id) {
                 if(this._logout) {
                     let lres = await this._logout(req, res, _config, this);
@@ -64,8 +65,10 @@ class Authentication {
                         _config.error(lres);
                         return;
                     }
-                } else req.session.id = null;
+                } else delete req.session.user_id;
             }
+
+            flash(req, {error: false, description: "Logout successful!"})
             _config.success();
         }
     }
@@ -77,19 +80,19 @@ class Authentication {
     }) {
         return async (req, res, next) => {
             const _config = new CheckConfig(config, res, req, next);
-            const id = req.session.id;
-            if(id || _config.required) {
+            const id = req.session.user_id;
+            if(id || !_config.required) {
                 if(id) {
-                    res.id = id;
-                    res.data = await this.deserialize(id, _config, this);
-                    if(res.data instanceof Error) {
-                        _config.error(res.data);
+                    req.id = id;
+                    req.data = await this.deserialize(id, _config, this);
+                    if(req.data instanceof Error) {
+                        _config.error(req.data);
                         return;
                     }
-                } else res.id = null;
+                } else req.id = null;
                 _config.success();
             } else {
-                res.id = null;
+                req.id = null;
                 _config.error(Error("Not authorized"));
             }
         }
@@ -101,17 +104,24 @@ class Authentication {
     }) {
         return async (req, res, next) => {
             const _config = new Configuration(config, res, req, next);
-            const id = req.session.id;
+
+            const errors = validationResult(req);
+            if(!errors.isEmpty() && errors.errors[0]) {
+                _config.error(new Error(errors.errors[0].msg));
+                return;
+            }
+            
+            const id = req.session.user_id;
             if(id) {
                 _config.success();
                 return;
             }
 
-            const mres = this.method(req, res, _config, this);
+            const mres = await this.method(req, res, _config, this);
             if(mres instanceof Error)
                 _config.error(mres);
             else if(mres) {
-                req.session.id = mres.id;
+                req.session.user_id = mres.id;
                 this.serialize(mres.id, mres.data, _config, this);
                 _config.success();
             } else _config.success();
@@ -129,14 +139,14 @@ class Authentication {
         let key = CryptoJS.PBKDF2(str, salt, {
             keySize: 256 / 32
         });
-        return {salt, key};
+        return {salt, key: key.toString(CryptoJS.enc.Hex)};
     }
 
     static checkHash(salt, hash, str) {
         let key = CryptoJS.PBKDF2(str, salt, {
             keySize: 256 / 32
         });
-        return key === hash;
+        return key.toString(CryptoJS.enc.Hex) === hash;
     }
 }
 

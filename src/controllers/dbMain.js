@@ -7,10 +7,14 @@ class UserTable extends Table {
             table.increments("id");
             table.string("username").unique().notNullable();
             table.string("password").notNullable();
-            table.string("email");
+            table.string("salt").notNullable();
+            table.string("email").unique();
             table.timestamp('created_at').defaultTo(pg.fn.now());
             table.boolean("is_admin").defaultTo(false).notNullable();
+            table.boolean("is_confirmed").defaultTo(false).notNullable();
         });
+
+        this._generatedID = true;
     }
 }
 
@@ -22,8 +26,13 @@ class ProfileTable extends Table {
             table.string("slug").notNullable();
             table.string("public_name");
             table.string("description");
+            table.json("images");
+            table.string("gender");
+            table.date("birthday");
             table.json("links");
         });
+
+        this._generatedID = true;
     }
 }
 
@@ -35,6 +44,8 @@ class CatTable extends Table {
             table.string("slug").notNullable();
             table.string("description");
         });
+
+        this._generatedID = true;
     }
 }
 
@@ -49,6 +60,8 @@ class PostTable extends Table {
             table.timestamp('created_at').defaultTo(pg.fn.now());
             table.timestamp('edited_at').defaultTo(pg.fn.now());
         });
+
+        this._generatedID = true;
     }
 }
 
@@ -62,6 +75,8 @@ class CommentTable extends Table {
             table.timestamp('created_at').defaultTo(pg.fn.now());
             table.timestamp('edited_at').defaultTo(pg.fn.now());
         });
+
+        this._generatedID = true;
     }
 }
 
