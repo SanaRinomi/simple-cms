@@ -3,11 +3,9 @@ const DB = require("./controllers/dbMain");
 
 // Express
 const express = require("express"),
-    handlebars = require("express-handlebars").create({defaultLayout:'main'}),
+    handlebars = require("express-handlebars").create({defaultLayout:'main', helpers: require('handlebars-helpers')(['html', 'markdown', 'url', 'string', 'code'])}),
     session = require("express-session"),
-    bodyParser = require("body-parser"),
-    KnexSessionStore = require('connect-session-knex')(session),
-    { body } = require('express-validator'),
+    KnexSessionStore = require('connect-session-knex')(session)
     auth = require("./controllers/localAuth");
 
 let server = express();
@@ -26,26 +24,20 @@ server.use(express.static('public'));
 
 server.use(session({ secret: settings.secret, store, proxy: settings.proxy, cookie: {secure:settings.secure}, saveUninitialized: false, resave: false}));
 server.use(express.json());
-server.use(express.urlencoded({extended:true}));
 
 server.get("/", (req, res) => {
     res.render("index", {page: {title: "Index"}, website, flash: flash(req)})
 });
 
+server.get("/json", (req, res) => {
+    res.json(flash(req));
+});
+
+// Authentication router - Deals with login, register and logout.
+server.use("/", require("./routes/auth"));
+
+// Admin router - Maeks sure the user is admin before doing admin stuff.
 server.use("/admin", require("./routes/admin"));
-
-server.post("/login",[
-    body("username").notEmpty().withMessage("Username can't be empty").trim().escape(),
-    body("password").isLength({min: 7}).withMessage("Password must be at least 7 characters long").escape()
-], auth.authenticate({redirectSuccess: "/", redirectFailure: "/"}));
-
-server.post("/register",[
-    body("username").notEmpty().withMessage("Username can't be empty").trim().escape(),
-    body("password").isLength({min: 7}).withMessage("Password must be at least 7 characters long").escape(),
-    body("email").isEmail().withMessage("Email must be an email").normalizeEmail()
-], auth.register({redirectSuccess: "/", redirectFailure: "/"}));
-
-server.get("/logout", auth.logOut({redirectSuccess: "/", redirectFailure: "/"}))
 
 server.use(function(req, res){
     const page = {

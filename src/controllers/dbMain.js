@@ -65,6 +65,22 @@ class PostTable extends Table {
     }
 }
 
+class UploadsTable extends Table {
+    constructor() {
+        super("uploads", table => {
+            table.increments("id");
+            table.string("title");
+            table.string("path").unique().notNullable();
+            table.string("mime").notNullable();
+            table.string("description");
+            table.json("details");
+            table.timestamp('created_at').defaultTo(pg.fn.now());
+        });
+
+        this._generatedID = true;
+    }
+}
+
 class CommentTable extends Table {
     constructor() {
         super("comments", table => {
@@ -84,8 +100,10 @@ const Users = new UserTable();
 const Profiles = new ProfileTable();
 const Categories = new CatTable();
 const Posts = new PostTable();
+const Uploads = new UploadsTable();
 const Comments = new CommentTable();
 const PostProfile = new LinkingTable("l_posts_profiles", "post_id", "posts.id", "profile_id", "profiles.id");
+const PostUpload = new LinkingTable("l_posts_uploads", "post_id", "posts.id", "upload_id", "upload.id");
 const PostCategory = new LinkingTable("l_posts_cat", "post_id", "posts.id", "cat_id", "categories.id");
 
 module.exports = {
@@ -95,5 +113,7 @@ module.exports = {
     Posts,
     Comments,
     PostProfile,
-    PostCategory
+    PostCategory,
+    Uploads,
+    PostUpload
 }

@@ -105,3 +105,6 @@ dist
 
 # Config File
 src/config.json
+
+#Uploads
+uploads/*

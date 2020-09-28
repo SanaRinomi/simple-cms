@@ -23,3 +23,7 @@ Fleshed out the local auth class (no testing as of right now)
 ## 23rd of September 2020
 Test and debug the auth and local auth classes.
 They are now fully functional, allowing for: Registering, Login, Logout, Serialization and Deserialization.
+
+## 28th of September 2020
+Started implementing file uploads and created a new table for additional upload data.
+Also created a bunch of new views for later
