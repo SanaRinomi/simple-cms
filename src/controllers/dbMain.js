@@ -27,7 +27,7 @@ class ProfileTable extends Table {
             table.string("public_name");
             table.string("description");
             table.json("images");
-            table.string("gender");
+            table.json("gender");
             table.date("birthday");
             table.json("links");
         });
@@ -54,9 +54,10 @@ class PostTable extends Table {
         super("posts", table => {
             table.increments("id");
             table.string("title").notNullable();
-            table.string("slug").notNullable();
+            table.string("slug").notNullable().unique();
             table.string("description");
             table.json("content");
+            table.json("thumbnail");
             table.timestamp('created_at').defaultTo(pg.fn.now());
             table.timestamp('edited_at').defaultTo(pg.fn.now());
         });
@@ -69,7 +70,8 @@ class UploadsTable extends Table {
     constructor() {
         super("uploads", table => {
             table.increments("id");
-            table.string("title");
+            table.string("title"); 
+            table.string("name"); 
             table.string("path").unique().notNullable();
             table.string("mime").notNullable();
             table.string("description");

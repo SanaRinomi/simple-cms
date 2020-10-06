@@ -31,7 +31,7 @@ class LocalAuthentication extends Authentication {
                     config.error(new Error("Failed to retrieve user data"));
                     return;
                 }
-                data = {isAdmin: query.data.is_admin, isConfirmed: query.data.is_confirmed, email: query.data.email};
+                data = {isAdmin: query.data.is_admin, isConfirmed: query.data.is_confirmed, email: query.data.email, username: query.data.username};
                 cache.set(id, data);
             }
             return data;
@@ -78,6 +78,9 @@ class LocalAuthentication extends Authentication {
             const query = await Users.upsert(null, {username: body.username, email: body.email, password: pass_hash.key, salt: pass_hash.salt});
             if(query.success) {
                 req.session.user_id = query.data.id;
+                req.id = query.data.id;
+                req.user = {isAdmin: false, isConfirmed: false, email: body.email, username: body.username}
+                this.serialize(req.id, req.user);
                 _config.success();
             } else _config.error(new Error("Query failed"));
         }

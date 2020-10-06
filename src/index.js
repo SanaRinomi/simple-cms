@@ -3,7 +3,7 @@ const DB = require("./controllers/dbMain");
 
 // Express
 const express = require("express"),
-    handlebars = require("express-handlebars").create({defaultLayout:'main', helpers: require('handlebars-helpers')(['html', 'markdown', 'url', 'string', 'code'])}),
+    handlebars = require("express-handlebars").create({defaultLayout:'main', helpers: {...require('handlebars-helpers')(['array', 'comparison', 'html', 'markdown', 'url', 'string', 'code']), date: require('helper-date')}}),
     session = require("express-session"),
     KnexSessionStore = require('connect-session-knex')(session)
     auth = require("./controllers/localAuth");
@@ -36,8 +36,20 @@ server.get("/json", (req, res) => {
 // Authentication router - Deals with login, register and logout.
 server.use("/", require("./routes/auth"));
 
-// Admin router - Maeks sure the user is admin before doing admin stuff.
+// Admin router - Makes sure the user is admin before doing admin stuff.
 server.use("/admin", require("./routes/admin"));
+
+// Me router - Current user profile and control.
+server.use("/me", require("./routes/me"));
+
+// User router - Display profiles only to non admin users and control for admin users.
+server.use("/user", require("./routes/user"));
+
+// Upload router - Manages uploading files to the server.
+server.use("/upload", require("./routes/upload"));
+
+// Test router - For testing functionality. Comment out in prod.
+server.use("/test", require("./routes/tests"));
 
 server.use(function(req, res){
     const page = {

@@ -84,9 +84,9 @@ class Authentication {
             if(id || !_config.required) {
                 if(id) {
                     req.id = id;
-                    req.data = await this.deserialize(id, _config, this);
-                    if(req.data instanceof Error) {
-                        _config.error(req.data);
+                    req.user = await this.deserialize(id, _config, this);
+                    if(req.user instanceof Error) {
+                        _config.error(req.user);
                         return;
                     }
                 } else req.id = null;

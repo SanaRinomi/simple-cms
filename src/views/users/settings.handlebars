@@ -1,0 +1,54 @@
+<form action="/upload/avatar" method="post" enctype="multipart/form-data" style="display: flex; flex-direction: column;">
+    <title>Avatar</title>
+    <h3>Avatar</h3>
+    <img src="{{profile.images.avatar.url}}" alt="{{user.username}}" height="250" width="250">
+    <label for="avatar">Upload new Avatar</label>
+    <input type="file" name="avatar" id="avatar">
+    <button type="submit" style="width: min-content;">Submit</button>
+</form>
+
+<form action="/me/settings" method="post" style="display: flex; flex-direction: column;">
+    <title>Info</title>
+    <h3>Info</h3>
+    <label for="public_name">Display Name</label>
+    <input type="text" name="public_name" id="public_name" value="{{profile.public_name}}">
+    <label for="description">Description</label>
+    <textarea name="description" id="description" cols="30" rows="10">{{profile.description}}</textarea>
+    <label for="birthday">Birthday</label>
+    <input type="date" name="birthday" id="birthday" value={{profile.birthday}}>
+    <fieldset>
+        <legend>Gender</legend>
+        <label for="g_name">Identity</label>
+        <input type="text" name="g_name" id="g_name" {{#if profile.gender}}value="{{profile.gender.name}}"{{/if}}>
+        <label for="g_pronouns">Pronouns</label>
+        <select name="g_pronouns" id="g_pronouns">
+            {{#not profile.gender}}<option value="0" disabled hidden selected>Select</option>{{/if}}
+            <option value="1" {{#eq profile.gender.pronouns "1"}}selected{{/eq}}>He/Him</option>
+            <option value="2" {{#eq profile.gender.pronouns "2"}}selected{{/eq}}>She/Her</option>
+            <option value="3" {{#eq profile.gender.pronouns "3"}}selected{{/eq}}>They/Them</option>
+        </select>
+    </fieldset>
+    <fieldset id="links">
+        <legend>Links</legend>
+        <label for="links[0][name]">Link Name</label>
+        <input type="text" name="links[0][name]">
+        <label for="links[0][url]">Link URL</label>
+        <input type="url" name="links[0][url]">
+
+        <label for="links[1][name]">Link Name</label>
+        <input type="text" name="links[1][name]">
+        <label for="links[1][url]">Link URL</label>
+        <input type="url" name="links[1][url]">
+
+        <label for="links[2][name]">Link Name</label>
+        <input type="text" name="links[2][name]">
+        <label for="links[2][url]">Link URL</label>
+        <input type="url" name="links[2][url]">
+
+        <label for="links[3][name]">Link Name</label>
+        <input type="text" name="links[3][name]">
+        <label for="links[3][url]">Link URL</label>
+        <input type="url" name="links[3][url]">
+    </fieldset>
+    <button type="submit" style="width: min-content;">Submit</button>
+</form>

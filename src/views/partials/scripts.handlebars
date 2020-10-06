@@ -6,3 +6,23 @@
     codeFix(document);
     // loadCommands();
 </script>
+
+<script>
+    const form = document.getElementById("form");
+    if(form) {
+        const submit = document.getElementById("submit");
+        const addField = document.getElementById("add");
+        let counter = 1;
+
+        addField.addEventListener("click", () => {
+            if(counter >= 6) return;
+            const elem = document.createElement("input");
+            elem.setAttribute("type", "file");
+            elem.setAttribute("name", "media");
+
+            form.insertBefore(elem, submit);
+
+            ++counter;
+        });
+    }
+</script>

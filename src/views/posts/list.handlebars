@@ -1,0 +1,13 @@
+<article>
+    <header>
+        <h2>Users</h2>
+    </header>
+{{#forEach page.posts}}
+    <a href="{{url}}">
+        <section style="display: flex; flex-direction: row;">
+            <img src="{{thumbnail.url}}" alt="{{thumbnail.description}}" height="100" width="100" style="padding: 5px;">
+            <h4 style="padding: 5px;">{{title}}</h4>
+        </section>
+    </a>
+{{/forEach}}
+</article>

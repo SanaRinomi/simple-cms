@@ -27,3 +27,11 @@ They are now fully functional, allowing for: Registering, Login, Logout, Seriali
 ## 28th of September 2020
 Started implementing file uploads and created a new table for additional upload data.
 Also created a bunch of new views for later
+
+## 29th of September to 1st of October 2020
+* Implemented file upload
+* Created user profile
+* Created user settings
+
+## 5th of October 2020
+We finished filling out the user settings, added the ability to create a post and list them out.
