@@ -22,7 +22,7 @@
         <input type="text" name="g_name" id="g_name" {{#if profile.gender}}value="{{profile.gender.name}}"{{/if}}>
         <label for="g_pronouns">Pronouns</label>
         <select name="g_pronouns" id="g_pronouns">
-            {{#not profile.gender}}<option value="0" disabled hidden selected>Select</option>{{/if}}
+            {{#not profile.gender}}<option value="0" disabled hidden selected>Select</option>{{/not}}
             <option value="1" {{#eq profile.gender.pronouns "1"}}selected{{/eq}}>He/Him</option>
             <option value="2" {{#eq profile.gender.pronouns "2"}}selected{{/eq}}>She/Her</option>
             <option value="3" {{#eq profile.gender.pronouns "3"}}selected{{/eq}}>They/Them</option>

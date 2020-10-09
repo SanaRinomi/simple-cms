@@ -3,8 +3,9 @@ const {website} = require("../controllers/constants");
 const auth = require("../controllers/localAuth");
 const flash = require("smol-flash");
 const router = express.Router();
-const {Posts} = require("../controllers/dbMain");
+const {Posts, PostUpload} = require("../controllers/dbMain");
 const { body, validationResult } = require('express-validator');
+const { authenticate } = require("../controllers/localAuth");
 const validator = (require('validator')).default;
 
 router.use(express.urlencoded({extended:true}));
@@ -33,7 +34,7 @@ router.get("/posts/:slug", async (req, res, next) => {
     if(!post.success)
         next(new Error("Post doesn't exist!"));
     else
-        res.render("admin/post", {page: {title: `${post.data.title} - Admin`}, website, flash: flash(req), post: post.data});
+        res.render("admin/post", {page: {title: `${post.data.title} - Admin`, scripts: ["/js/dropzone.min.js", "/js/postGen.js"]}, website, flash: flash(req), post: post.data});
 });
 
 router.post("/posts/",
@@ -90,6 +91,8 @@ router.post("/posts/:slug", [
                 case "content":
                     let filtered = value.filter(v => {return v.type && v.data});
                     if(filtered.length === 0) break;
+                    const imgs = filtered.filter(v => v.id);
+                    if(imgs && imgs.length) await PostUpload.link(post.data.id, imgs.map(v => v.id), false);
                     dbQuery.content = filtered;
                     break;
             
@@ -97,8 +100,9 @@ router.post("/posts/:slug", [
                     break;
             }
         }
-        
-        res.json(await Posts.upsert(post.data.id, dbQuery));
+
+        if(Object.keys(dbQuery).length !== 0){res.json(await Posts.upsert(post.data.id, dbQuery))}
+        else {res.json({success: false, reason: "No data"})}
     }
 });
 

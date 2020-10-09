@@ -1,0 +1,8 @@
+{{#forEach post.content}}
+    {{#eq type "markdown"}}
+        {{#markdown}}{{data}}{{/markdown}}
+    {{/eq}}
+    {{#eq type "img"}}
+        <img src="{{data}}" alt="">
+    {{/eq}}
+{{/forEach}}

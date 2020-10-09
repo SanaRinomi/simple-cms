@@ -1,5 +1,5 @@
 const {port, settings, website} = require("./controllers/constants");
-const DB = require("./controllers/dbMain");
+const {Posts} = require("./controllers/dbMain");
 
 // Express
 const express = require("express"),
@@ -18,12 +18,12 @@ if(settings.proxy) server.set('trust proxy', 1);
 
 server.engine('handlebars', handlebars.engine);
 server.set('view engine', 'handlebars');
-server.set('views', 'src/views')
-
-server.use(express.static('public'));
+server.set('views', 'src/views');
 
 server.use(session({ secret: settings.secret, store, proxy: settings.proxy, cookie: {secure:settings.secure}, saveUninitialized: false, resave: false}));
 server.use(express.json());
+
+server.use(express.static('src/public'));
 
 server.get("/", (req, res) => {
     res.render("index", {page: {title: "Index"}, website, flash: flash(req)})
@@ -31,6 +31,14 @@ server.get("/", (req, res) => {
 
 server.get("/json", (req, res) => {
     res.json(flash(req));
+});
+
+server.get("/posts/:slug", async (req, res) => {
+    let post = await Posts.get({slug: req.params.slug});
+    if(!post.success)
+        next(new Error("Post doesn't exist!"));
+    else
+        res.render("posts/post", {page: {title: `${post.data.title}`}, website, flash: flash(req), post: post.data});
 });
 
 // Authentication router - Deals with login, register and logout.

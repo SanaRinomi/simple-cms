@@ -23,7 +23,6 @@ router.use(auth.isLoggedIn({redirectFailure: "/"}), async (req, res, next) => {
 });
 
 router.get("/", (req, res) => {
-    console.log(req.user);
     res.render("users/index", {page: {title: req.user.username}, website, flash: flash(req), profile: req.profile, user: req.user});
 });
 

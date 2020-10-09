@@ -35,3 +35,6 @@ Also created a bunch of new views for later
 
 ## 5th of October 2020
 We finished filling out the user settings, added the ability to create a post and list them out.
+
+## 7th of October 2020
+Added image upload, section organization and section duplication. Also linked posts to uploads.

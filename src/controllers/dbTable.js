@@ -1,3 +1,4 @@
+const { insert } = require("./dbKnex");
 const pg = require("./dbKnex");
 class DBTable {
     constructor(tablename, table = function(table){
@@ -21,8 +22,8 @@ class DBTable {
         return true;
     }
 
-    async del(id) {
-        let res = await pg(this._name).where(typeof id === "object" ? id : {id}).del();
+    async del(id, field = null) {
+        let res = await Array.isArray(id) ? pg(this._name).whereIn(field ? field : "id", id).del() : pg(this._name).where(field ? field : typeof id === "object" ? id : {id}, field ? typeof id === "object" ? id : {id} : undefined).del();
         
         if(res)
             return true;
@@ -74,13 +75,18 @@ class DBTable {
     }
 
     async insert(data, returning = ["id"]) {
-        for (const key in data) {
-            if (data.hasOwnProperty(key)) {
-                const element = data[key];
-                if(typeof element === "object")
-                data[key] = JSON.stringify(element);
+        let clean = (dirtyData) => {
+            for (const key in data) {
+                if (dirtyData.hasOwnProperty(key)) {
+                    const element = dirtyData[key];
+                    if(typeof element === "object")
+                    dirtyData[key] = JSON.stringify(element);
+                }
             }
+            return dirtyData;
         }
+
+        data = Array.isArray(data) ? data.map(v => clean(v)) : clean(data);        
 
         let res = await pg(this._name).returning(returning).insert(data);
         
@@ -96,6 +102,85 @@ class LinkingTable extends DBTable {
             table.integer(referenceXName).unsigned().references(referenceXLink).notNullable();
             table.integer(referenceYName).unsigned().references(referenceYLink).notNullable();
         });
+        this.refX = {name: referenceXName, link: referenceXLink, table: referenceXLink.split(".").shift()};
+        this.refY = {name: referenceYName, link: referenceYLink, table: referenceYLink.split(".").shift()};
+    }
+
+    insert(data) {
+        return super.insert(data, [this.refX.name, this.refY.name]);
+    }
+
+    async link(idX, idY, join = true) {
+        let arr = Array.isArray(idX) ? {array: {...this.refX, data: idX}, ref: {...this.idY, data: idY}} : Array.isArray(idY) ? {array: {...this.refY, data: idY}, ref: {...this.refX, data: idX}} : null;
+        if(arr) {
+            console.log(arr);
+            let jRes = await this.getLinked(arr.array.table, arr.ref.data);
+            if(jRes.success) {
+                if(!join) {
+                    console.log("Join = false");
+                    let rem = jRes.data.map(v => {
+                        return {
+                            id: v,
+                            notPresent: !arr.array.data.includes(v)
+                        }
+                    }).filter(v => v.notPresent).map(v => v.id);
+                    console.log(rem);
+                    let works = await pg(this._name).whereIn(arr.array.name, rem).andWhere(function() {this.where(arr.ref.name, arr.ref.data)}).del();
+                    console.log(works);
+                }
+
+                let add = arr.array.data.map(v => {
+                    return {
+                        id: v,
+                        notPresent: jRes.data.includes(v)
+                    }
+                }).filter(v => v.notPresent).map(v => {
+                    let addObj = {};
+                    addObj[arr.ref.name] = arr.id;
+                    addObj[arr.array.name] = v;
+                    return addObj;
+                });
+
+                console.log(add);
+                const insert = await this.insert(add);
+                console.log(insert);
+                return insert;
+            } else {
+                const insert = await this.insert(arr.array.data.map(v => {
+                    let addObj = {};
+                    addObj[arr.ref.name] = arr.ref.data;
+                    addObj[arr.array.name] = v;
+                    return addObj;
+                }));
+                return insert;
+            }
+        } else {
+            let obj = {};
+            obj[this.refX.name] = idX;
+            obj[this.refY.name] = idY;
+            return await this.insert(obj);
+        }
+    }
+
+    async getLinked(table, id) {
+        let obj = {}, filter = "";
+        if(table === this.refX.table)
+            {obj[this.refY.name] = id; filter = this.refX.name;}
+        else if(table === this.refY.table) 
+            {obj[this.refX.name] = id; filter = this.refY.name;}
+        else throw Error(table + " is not linked here");
+        console.log(obj);
+        const res = await this.get(obj, [filter], true);
+        if(res.success) {
+            return {id, success: true, data: res.data.map(v => v[filter])}
+        } else return {id, success: false};
+    }
+
+    async removeLinked(idX, idY) {
+        let obj = {};
+        obj[this.refX.name] = idX;
+        obj[this.refY.name] = idY;
+        return await this.del(obj);
     }
 }
 
