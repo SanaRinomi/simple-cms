@@ -23,7 +23,7 @@ class DBTable {
     }
 
     async del(id, field = null) {
-        let res = await Array.isArray(id) ? pg(this._name).whereIn(field ? field : "id", id).del() : pg(this._name).where(field ? field : typeof id === "object" ? id : {id}, field ? typeof id === "object" ? id : {id} : undefined).del();
+        let res = await (Array.isArray(id) ? pg(this._name).whereIn(field ? field : "id", id).del() : pg(this._name).where(field ? field : typeof id === "object" ? id : {id}, field ? typeof id === "object" ? id : {id} : undefined).del());
         
         if(res)
             return true;
@@ -173,6 +173,17 @@ class LinkingTable extends DBTable {
         let obj = {};
         obj[this.refX.name] = idX;
         obj[this.refY.name] = idY;
+        return await this.del(obj);
+    }
+
+    async removeAllLinked(table, id) {
+        let obj = {};
+        if(table === this.refX.table)
+            obj[this.refY.name] = id;
+        else if(table === this.refY.table) 
+            obj[this.refX.name] = id;
+        else throw Error(table + " is not linked here");
+
         return await this.del(obj);
     }
 }

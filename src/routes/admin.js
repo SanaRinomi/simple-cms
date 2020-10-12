@@ -3,7 +3,7 @@ const {website} = require("../controllers/constants");
 const auth = require("../controllers/localAuth");
 const flash = require("smol-flash");
 const router = express.Router();
-const {Posts, PostUpload} = require("../controllers/dbMain");
+const {Posts, PostUpload, Uploads} = require("../controllers/dbMain");
 const { body, validationResult } = require('express-validator');
 const { authenticate } = require("../controllers/localAuth");
 const validator = (require('validator')).default;
@@ -26,7 +26,7 @@ router.get("/", (req, res) => {
 router.get("/posts/", async (req, res) => {
     const posts = (await Posts.getAll(["title", "slug", "thumbnail"])).data.map(v => {return {title: v.title, thumbnail: v.thumbnail, url: `./posts/${v.slug}`}});
 
-    res.render("posts/list", {page: {title: "Admin", posts}, website, flash: flash(req)});
+    res.render("admin/posts", {page: {title: "Posts - Admin", posts, scripts: ["/js/postManage.js"]}, website, flash: flash(req)});
 });
 
 router.get("/posts/:slug", async (req, res, next) => {
@@ -35,6 +35,14 @@ router.get("/posts/:slug", async (req, res, next) => {
         next(new Error("Post doesn't exist!"));
     else
         res.render("admin/post", {page: {title: `${post.data.title} - Admin`, scripts: ["/js/dropzone.min.js", "/js/postGen.js"]}, website, flash: flash(req), post: post.data});
+});
+
+router.get("/uploads/", async (req, res) => {
+    const uploads = await Promise.all((await Uploads.getAll(["path", "id", "title", "description"])).data.map(async v => {
+        const linked = await PostUpload.getLinked("posts", v.id);
+        return {title: v.title, id: v.id, url: `/upload/${v.path}`, description: v.description, linked: linked.success}
+    }));
+    res.render("admin/uploads", {page: {title: "Uploads - Admin", posts: uploads, scripts: ["/js/uploadsManage.js"]}, website, flash: flash(req)});
 });
 
 router.post("/posts/",
@@ -83,7 +91,7 @@ router.post("/posts/:slug", [
         for (const [key, value] of Object.entries(req.body)) {
             switch (key) {
                 case "title":
-                    dbQuery.public_name = value;
+                    dbQuery.title = value;
                     break;
                 case "description":
                     dbQuery.description = value;
@@ -102,9 +110,24 @@ router.post("/posts/:slug", [
         }
 
         if(Object.keys(dbQuery).length !== 0){res.json(await Posts.upsert(post.data.id, dbQuery))}
-        else {res.json({success: false, reason: "No data"})}
+        else {res.status(400).json({success: false, reason: "No data"})}
     }
 });
+
+router.delete("/posts/:slug", async (req, res) => {
+    let post = await Posts.get({slug: req.params.slug});
+    console.log(post)
+    if(!post.success)
+        res.status(404).json({success: false, reason: "Resource doesn't exist"});
+    else {
+        let uploads = await PostUpload.removeAllLinked("upload", post.data.id);
+        console.log(uploads);
+        let postDel = await Posts.del(post.data.id);
+        console.log(postDel);
+
+        res.json({success: postDel});
+    }
+})
 
 router.get("/upload", (req, res) => {
     res.render("admin/upload", {page: {title: "Admin"}, website, flash: flash(req)});

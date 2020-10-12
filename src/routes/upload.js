@@ -9,7 +9,7 @@ const path = require('path');
 const fs = require('fs');
 const validator = require("validator");
 const mime = require("mime");
-const {Uploads, Profiles} = require("../controllers/dbMain");
+const {Uploads, Profiles, PostUpload} = require("../controllers/dbMain");
 
 const uploadPath = path.join(process.cwd(), "upload");
 
@@ -198,5 +198,36 @@ router.post("/avatar", auth.isLoggedIn({redirectFailure: "/json"}), upload.singl
         });
     }
 });
+
+router.delete("/id/:id", auth.isLoggedIn({redirectFailure: "/json"}), (req, res, next) => {
+    if(req.user.isAdmin){
+        next();
+    }
+    else {
+        flash(req, {error: true, description: "You need to be admin to access here"});
+        res.redirect("/json");
+    }
+}, async (req, res) => {
+    let dbres = await Uploads.get(req.params.id);
+    if(!dbres.success || !fs.existsSync(path.join(uploadPath, dbres.data.path))) {
+        res.status(404).json({success: false, reason: "Resource not found"});
+        return;
+    }
+
+    let linksDel = await PostUpload.removeAllLinked("posts", req.params.id);
+    console.log(linksDel);
+    let dbdel = await Uploads.del(req.params.id);
+    console.log(dbdel);
+    if(dbdel) {
+        fs.unlink(path.join(uploadPath, dbres.data.path), (err) => {
+            if(err) {
+                console.error(err);
+                res.status(500).json({success: false, reason: "File failed to delete from file system"});
+            } else res.json({success: true});
+        });
+    } else 
+        res.status(500).json({success: false, reason: "File failed to delete from DB"});
+    
+})
 
 module.exports = router;

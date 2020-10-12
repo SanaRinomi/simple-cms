@@ -38,3 +38,12 @@ We finished filling out the user settings, added the ability to create a post an
 
 ## 7th of October 2020
 Added image upload, section organization and section duplication. Also linked posts to uploads.
+
+## 12th of October 2020
+Moved "Create new post" into admin's post list and added the ability to delete posts.
+
+Created a list of uploads that indicate which uploads are linked with posts and added the ability to remove uploads.
+
+Added the ability to view post details when a post is selected in post editor.
+
+Cleaned up admin index and added links to the the lists AKA managers.

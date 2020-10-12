@@ -1,0 +1,29 @@
+<form action="/admin/posts" method="post">
+    <h2>New Post</h2>
+    <label for="slug">Post Slug</label>
+    <input type="text" name="slug" id="new-slug">
+    <label for="title">Post Title</label>
+    <input type="text" name="title" id="new-title">
+
+    <button type="submit">Submit</button>
+</form>
+
+<article>
+    <header>
+        <h2>Posts</h2>
+    </header>
+{{#forEach page.posts}}
+    <section class="list-elem" slug="{{slug}}">
+        <a href=".{{url}}" class="list-link">
+            <section style="display: flex; flex-direction: row;">
+                <img src="{{thumbnail.url}}" alt="{{thumbnail.description}}" height="100" width="100" style="padding: 5px;">
+                <h4 style="padding: 5px;">{{title}}</h4>
+            </section>
+        </a>
+
+        <input type="text" name="" class="input-title">
+        <button class="button-update">Update</button>
+        <button class="button-delete">Delete</button>
+    </section>
+{{/forEach}}
+</article>
