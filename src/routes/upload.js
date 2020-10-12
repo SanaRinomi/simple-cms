@@ -84,7 +84,6 @@ router.get("/:file", async (req, res, next) => {
 
 router.get("/id/:id", async (req, res, next) => {
     let dbres = await Uploads.get(req.params.id);
-    console.log(dbres);
     if(!dbres.success || !fs.existsSync(path.join(uploadPath, dbres.data.path))) {
         let page = {
             title: "404"
@@ -113,20 +112,16 @@ router.get("/id/:id", async (req, res, next) => {
 });
 
 router.post("/", auth.isLoggedIn({redirectFailure: "/json"}), (req, res, next) => {
-    console.log("Checking if admin");
     if(req.user.isAdmin){
-        console.log("Admin check pass");
         next();
     }
     else {
-        console.log("Admin check failed");
         flash(req, {error: true, description: "You need to be admin to access here"});
         res.redirect("/json");
     }
 }, upload.array("media"), async (req, res) => {
     const media = req.files;
     if(Array.isArray(media) && media.length) {
-        console.log("Recieved files");
         let data = {
             error: false,
             media: []
@@ -134,7 +129,6 @@ router.post("/", auth.isLoggedIn({redirectFailure: "/json"}), (req, res, next) =
 
         await Promise.all(media.map(async (content) => {
             let ext = path.extname(content.originalname);
-            console.log(`Uploaded file: ${content.filename} with the extention ${ext}`);
             const dbres = await Uploads.insert({
                 name: path.basename(content.filename, path.extname(content.filename)),
                 title: path.basename(content.originalname, path.extname(content.originalname)),
@@ -149,7 +143,6 @@ router.post("/", auth.isLoggedIn({redirectFailure: "/json"}), (req, res, next) =
 
         res.json(data);
     } else {
-        console.log("No files recieved");
         res.json({
             error: true,
             description: "No files provided"
@@ -160,14 +153,12 @@ router.post("/", auth.isLoggedIn({redirectFailure: "/json"}), (req, res, next) =
 router.post("/avatar", auth.isLoggedIn({redirectFailure: "/json"}), upload.single("avatar"), async (req, res) => {
     const media = req.file;
     if(media) {
-        console.log("Recieved files");
         let data = {
             error: false,
             media: []
         };
 
         let ext = path.extname(media.originalname);
-            console.log(`Uploaded file: ${media.filename} with the extention ${ext}`);
             const dbres = await Uploads.insert({
                 name: path.basename(media.filename, path.extname(media.filename)),
                 title: path.basename(media.originalname, path.extname(media.originalname)),
@@ -189,7 +180,6 @@ router.post("/avatar", auth.isLoggedIn({redirectFailure: "/json"}), upload.singl
                     avatar: {url: `/upload/${media.filename}`, id: dbres.data[0].id}
                 };
 
-                console.log(images);
                 const update = await Profiles.upsert(profile.data.id, {images});
                 if(update.success)
                     data.media.push({success: true, data: "Avatar uploaded and set"});
@@ -202,7 +192,6 @@ router.post("/avatar", auth.isLoggedIn({redirectFailure: "/json"}), upload.singl
 
         res.json(data);
     } else {
-        console.log("No files recieved");
         res.json({
             error: true,
             description: "No files provided"

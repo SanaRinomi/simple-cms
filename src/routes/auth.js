@@ -32,7 +32,6 @@ router.post("/register",[
     body("email").isEmail().withMessage("Email must be an email").normalizeEmail()
 ], auth.register({redirectFailure: "/"}), async (req, res) => {
     const profile = await Profiles.insert({user_id: req.id, slug: req.user.username.toLowerCase().split(" ").join("_"), images: {avatar: {url: "https://images.unsplash.com/photo-1549845375-ce0a0ba8288c", id: 0}}});
-    console.log(profile);
     res.redirect("/");
 });
 

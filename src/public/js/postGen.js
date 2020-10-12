@@ -109,8 +109,6 @@ let sendPost = () => {
         }
     }
 
-    console.log(data)
-
     fetch(`/admin/posts/${slug}`,{
         method: "POST",
         body: data.join("&"),
@@ -167,9 +165,6 @@ sectCreate.submit.addEventListener("click", (e) => {
                     data.append(`media`, v, v.name);
                 });
 
-                console.log(child);
-                console.log([...data.entries()]);
-
                 fetch("/upload", {
                     method: "POST",
                     body: data
@@ -182,7 +177,6 @@ sectCreate.submit.addEventListener("click", (e) => {
                         return;
                     }
                     const img = document.createElement("img");
-                    console.log(res.media[0]);
                     img.src = `/upload/${res.media[0].data.path}`;
                     img.setAttribute("section-type", "img");
                     img.setAttribute("content-id", res.media[0].data.id);

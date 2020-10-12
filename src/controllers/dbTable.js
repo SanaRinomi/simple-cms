@@ -113,20 +113,16 @@ class LinkingTable extends DBTable {
     async link(idX, idY, join = true) {
         let arr = Array.isArray(idX) ? {array: {...this.refX, data: idX}, ref: {...this.idY, data: idY}} : Array.isArray(idY) ? {array: {...this.refY, data: idY}, ref: {...this.refX, data: idX}} : null;
         if(arr) {
-            console.log(arr);
             let jRes = await this.getLinked(arr.array.table, arr.ref.data);
             if(jRes.success) {
                 if(!join) {
-                    console.log("Join = false");
                     let rem = jRes.data.map(v => {
                         return {
                             id: v,
                             notPresent: !arr.array.data.includes(v)
                         }
                     }).filter(v => v.notPresent).map(v => v.id);
-                    console.log(rem);
                     let works = await pg(this._name).whereIn(arr.array.name, rem).andWhere(function() {this.where(arr.ref.name, arr.ref.data)}).del();
-                    console.log(works);
                 }
 
                 let add = arr.array.data.map(v => {
@@ -141,9 +137,7 @@ class LinkingTable extends DBTable {
                     return addObj;
                 });
 
-                console.log(add);
                 const insert = await this.insert(add);
-                console.log(insert);
                 return insert;
             } else {
                 const insert = await this.insert(arr.array.data.map(v => {
@@ -169,7 +163,6 @@ class LinkingTable extends DBTable {
         else if(table === this.refY.table) 
             {obj[this.refX.name] = id; filter = this.refY.name;}
         else throw Error(table + " is not linked here");
-        console.log(obj);
         const res = await this.get(obj, [filter], true);
         if(res.success) {
             return {id, success: true, data: res.data.map(v => v[filter])}
