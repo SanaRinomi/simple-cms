@@ -1,0 +1,28 @@
+<form action="/admin/categories" method="post">
+    <h2>New Category</h2>
+    <label for="slug">Category Slug</label>
+    <input type="text" name="slug" id="new-slug">
+    <label for="title">Category Name</label>
+    <input type="text" name="name" id="new-name">
+
+    <button type="submit">Submit</button>
+</form>
+
+<article>
+    <header>
+        <h2>Categories</h2>
+    </header>
+{{#forEach page.posts}}
+    <section class="list-elem" slug="{{slug}}">
+        <a href="/admin/categories/{{slug}}" class="list-link">
+            <section>
+                <h4>{{name}}</h4>
+                <p>{{description}}</p>
+            </section>
+        </a>
+
+        <button class="button-delete">Delete</button>
+        <a href="/categories/{{slug}}"><button class="button-goto">View Category as User</button></a>
+    </section>
+{{/forEach}}
+</article>

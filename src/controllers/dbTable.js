@@ -7,6 +7,7 @@ class DBTable {
         this._name = tablename;
         this._table = table;
         this._generatedID = false;
+        this._timestamp = null;
         this.create();
     }
 
@@ -64,6 +65,7 @@ class DBTable {
         }
 
         if(res && res.length && res[0]) {
+            if(this._timestamp) data[this._timestamp] = pg.fn.now();
             res = await pg(this._name).where(!this._generatedID ? typeof id === "object" ? id : {id} : {id: res[0].id}).update(data, typeof id === "object" ? Object.keys(id) : ["id"]);
         } else {
             res = await pg(this._name).returning(!this._generatedID && typeof id === "object" ? Object.keys(id) : ["id"]).insert(id ? typeof id === "object" ? {...id, ...data} : {id, ...data} : data);

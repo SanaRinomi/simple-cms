@@ -32,7 +32,7 @@
         </tr>
         <tr>
             <td>Title</td>
-            <td>{{post.title}} <button>Edit</button></td>
+            <td class="editable-property" type="text" value="{{post.title}}" name="title"></td>
         </tr>
         <tr>
             <td>Slug</td>
@@ -40,11 +40,11 @@
         </tr>
         <tr>
             <td>Description</td>
-            <td>{{post.description}} <button>Edit</button></td>
+            <td class="editable-property" type="textbox" value="{{post.description}}"  name="description"></td>
         </tr>
         <tr>
             <td>Thumbnail</td>
-            <td><a href="{{post.thumbnail.url}}">View</a> <button>Edit</button></td>
+            <td class="editable-property" type="file" value="{{post.thumbnail.url}}" name="thumbnail"></td>
         </tr>
         <tr>
             <td>Created At</td>
@@ -56,3 +56,6 @@
         </tr>
     </table>
 </article>
+
+<h3>Post Delete</h3>
+<button id="button-delete">Delete</button>

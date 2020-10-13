@@ -14,7 +14,7 @@
     </header>
 {{#forEach page.posts}}
     <section class="list-elem" slug="{{slug}}">
-        <a href=".{{url}}" class="list-link">
+        <a href="/admin/posts/{{slug}}" class="list-link">
             <section style="display: flex; flex-direction: row;">
                 <img src="{{thumbnail.url}}" alt="{{thumbnail.description}}" height="100" width="100" style="padding: 5px;">
                 <h4 style="padding: 5px;">{{title}}</h4>
@@ -24,6 +24,7 @@
         <input type="text" name="" class="input-title">
         <button class="button-update">Update</button>
         <button class="button-delete">Delete</button>
+        <a href="/posts/{{slug}}"><button class="button-goto">View Post as User</button></a>
     </section>
 {{/forEach}}
 </article>

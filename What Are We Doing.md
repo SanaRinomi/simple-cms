@@ -47,3 +47,10 @@ Created a list of uploads that indicate which uploads are linked with posts and 
 Added the ability to view post details when a post is selected in post editor.
 
 Cleaned up admin index and added links to the the lists AKA managers.
+
+## 13th of October 2020
+Post titles, descriptions and thumbnails can now be edited in the post editor, as well as deleting the post from within there.
+
+Categories are now listed and can be created. Category descriptions and names can be changed from the category editor.
+
+Table class can now update the "Last modified" column when the column is specified and an upsert has occured.

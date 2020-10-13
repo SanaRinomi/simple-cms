@@ -63,6 +63,7 @@ class PostTable extends Table {
         });
 
         this._generatedID = true;
+        this._timestamp = "edited_at";
     }
 }
 
@@ -95,6 +96,7 @@ class CommentTable extends Table {
         });
 
         this._generatedID = true;
+        this._timestamp = "edited_at";
     }
 }
 
