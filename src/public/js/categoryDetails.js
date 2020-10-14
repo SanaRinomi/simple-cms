@@ -17,8 +17,6 @@ const propertySubmit = function(property) {
             if(field.files) [...field.files].forEach(v => {
                 fileData.append(`media`, v, v.name);
             });
-
-            console.log([...fileData.entries()]);
             
             fetch("/upload", {
                 method: "POST",
@@ -35,10 +33,6 @@ const propertySubmit = function(property) {
                 property.value = `/upload/${res.media[0].data.path}`;
 
                 let obj = JSON.stringify({url: `/upload/${res.media[0].data.path}`, description: "", id: res.media[0].data.id});
-                console.log("Property:");
-                console.log(property);
-                console.log("Req JSON:");
-                console.log(obj);
 
                 fetch(`/admin/categories/${slug}`, {
                     method: "POST",
@@ -50,7 +44,6 @@ const propertySubmit = function(property) {
                     if(!res.ok) console.error("Response failed");
                     return res.json();
                 }).then(res => {
-                    console.log(res);
                     createSetProperty(property);
                 });
             });
@@ -176,7 +169,6 @@ document.getElementById("button-delete").addEventListener("click", () => {
 
         return res.json();
     }).then((res) => {
-        console.log(res);
         if(res.success) window.location.replace("/admin");
     });
 });

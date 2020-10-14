@@ -14,7 +14,6 @@ const posts = document.getElementsByClassName("list-elem");
 
             return res.json();
         }).then((res) => {
-            console.log(res);
             if(res.success) post.remove();
         });
     });

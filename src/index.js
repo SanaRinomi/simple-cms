@@ -3,7 +3,7 @@ const {Posts} = require("./controllers/dbMain");
 
 // Express
 const express = require("express"),
-    handlebars = require("express-handlebars").create({defaultLayout:'main', helpers: {...require('handlebars-helpers')(['array', 'comparison', 'html', 'markdown', 'url', 'string', 'code']), date: require('helper-date')}}),
+    handlebars = require("express-handlebars").create({defaultLayout:'main', helpers: {...require('handlebars-helpers')(['array', 'object', 'comparison', 'html', 'markdown', 'url', 'string', 'code']), date: require('helper-date')}}),
     session = require("express-session"),
     KnexSessionStore = require('connect-session-knex')(session)
     auth = require("./controllers/localAuth");

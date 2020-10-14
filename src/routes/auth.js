@@ -4,7 +4,7 @@ const auth = require("../controllers/localAuth");
 const flash = require("smol-flash");
 const router = express.Router();
 const { body } = require('express-validator');
-const {Profiles} = require('../controllers/dbMain');
+const {Profiles, Uploads} = require('../controllers/dbMain');
 
 
 router.use(express.urlencoded({extended:true}));
@@ -31,8 +31,10 @@ router.post("/register",[
     body("password").isLength({min: 7}).withMessage("Password must be at least 7 characters long").escape(),
     body("email").isEmail().withMessage("Email must be an email").normalizeEmail()
 ], auth.register({redirectFailure: "/"}), async (req, res) => {
-    const profile = await Profiles.insert({user_id: req.id, slug: req.user.username.toLowerCase().split(" ").join("_"), images: {avatar: {url: "https://images.unsplash.com/photo-1549845375-ce0a0ba8288c", id: 0}}});
-    res.redirect("/");
+    const defaults = await Uploads.getUserDefault();
+
+    const profile = await Profiles.insert({user_id: req.user.id, slug: req.user.username.toLowerCase().split(" ").join("_"), pfp: defaults.pfp ? defaults.pfp.id : 1, pfc: defaults.pfc ? defaults.pfc.id : 1});
+    res.redirect("/me");
 });
 
 module.exports = router;

@@ -1,6 +1,6 @@
 <article>
     <header>
-        <img src="{{profile.images.avatar.url}}" alt="{{#if profile.public_name}}{{profile.public_name}}{{else}}{{user.username}}{{/if}}" height="250" width="250">
+        {{#if profile.pfp}}<img src="/upload/id/{{profile.pfp}}" alt="{{#if profile.public_name}}{{profile.public_name}}{{else}}{{user.username}}{{/if}}'s Profile Picture'" height="250" width="250">{{/if}}
         <h2>{{#if profile.public_name}}{{profile.public_name}}{{else}}{{user.username}}{{/if}}</h2>
     </header>
     <section id="l-description">
@@ -12,9 +12,9 @@
             <li><b>Birthday:</b> {{#if profile.birthday}}{{date profile.birthday "DD MMMM"}}{{else}}None Set{{/if}}</li>
         </ul>
     </section>
-    <section>
+    {{#if profile.links}}<section>
         <ul>{{#forEach profile.links}}
             <li><a href="{{url}}">{{name}}</a></li>{{/forEach}}
         </ul>
-    </section>
+    </section>{{/if}}
 </article>

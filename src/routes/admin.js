@@ -7,7 +7,7 @@ const router = express.Router();
 router.use(express.urlencoded({extended:true}));
 
 router.use(auth.isLoggedIn({redirectFailure: "/"}), (req, res, next) => {
-    if(req.user.isAdmin)
+    if(req.user.is_admin)
         next();
     else {
         flash(req, {error: true, description: "You need to be admin to access here"});

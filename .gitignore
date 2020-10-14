@@ -108,3 +108,4 @@ src/config.json
 
 #Uploads
 upload/*
+!upload/default.png

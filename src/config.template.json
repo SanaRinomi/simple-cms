@@ -14,5 +14,6 @@
     "secret": "cats",
     "port": 8080,
     "proxy": false,
-    "secure": true
+    "secure": true,
+    "setup": false
 }

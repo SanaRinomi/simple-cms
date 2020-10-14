@@ -13,11 +13,12 @@ const {Uploads, Profiles, Users} = require("../controllers/dbMain");
 
 router.get("/profile", auth.isLoggedIn({redirectFailure: "/"}), async (req, res) => {
     let profile = await Profiles.get({user_id: req.session.user_id});
-    if(!profile.success) {
-        await Profiles.insert({user_id: req.session.user_id, slug: req.user.username.toLowerCase().split(" ").join("_")});
-        profile = await Profiles.get({user_id: req.session.user_id});
-    }
     res.json(profile);
+});
+
+router.get("/profile/cache", auth.isLoggedIn({redirectFailure: "/"}), async (req, res) => {
+    let profile = Profiles._CacheObj;
+    res.json(profile.map);
 });
 
 router.get("/profile/images", auth.isLoggedIn({redirectFailure: "/"}), async (req, res) => {

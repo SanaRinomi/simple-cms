@@ -6,7 +6,8 @@ const {Posts, PostUpload} = require("../../controllers/dbMain");
 const { body, validationResult } = require('express-validator');
 
 router.get("/posts/", async (req, res) => {
-    const posts = (await Posts.getAll(["title", "slug", "thumbnail"])).data.map(v => {return {title: v.title, thumbnail: v.thumbnail, url: `/posts/${v.slug}`, slug: v.slug}});
+    const dbPosts = await Posts.getAll(["title", "slug", "thumbnail"]);
+    const posts = dbPosts.success ? dbPosts.data.map(v => {return {title: v.title, thumbnail: v.thumbnail, url: `/posts/${v.slug}`, slug: v.slug}}) : null;
 
     res.render("admin/posts", {page: {title: "Posts - Admin", posts, scripts: ["/js/postManage.js"]}, website, flash: flash(req)});
 });
@@ -97,14 +98,11 @@ router.post("/posts/:slug", [
 
 router.delete("/posts/:slug", async (req, res) => {
     let post = await Posts.get({slug: req.params.slug});
-    console.log(post)
     if(!post.success)
         res.status(404).json({success: false, reason: "Resource doesn't exist"});
     else {
         let uploads = await PostUpload.removeAllLinked("upload", post.data.id);
-        console.log(uploads);
         let postDel = await Posts.del(post.data.id);
-        console.log(postDel);
 
         res.json({success: postDel});
     }

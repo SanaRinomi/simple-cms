@@ -22,8 +22,10 @@ router.use(auth.isLoggedIn({redirectFailure: "/"}), async (req, res, next) => {
     next();
 });
 
-router.get("/", (req, res) => {
-    res.render("users/index", {page: {title: req.user.username}, website, flash: flash(req), profile: req.profile, user: req.user});
+router.get("/", async (req, res) => {
+    const profile = await Profiles.get({user_id: req.user.id});
+
+    res.render("users/index", {page: {title: req.user.username}, website, flash: flash(req), profile: profile.success ? profile.data : req.profile, user: req.user});
 });
 
 router.get("/settings", (req, res) => {

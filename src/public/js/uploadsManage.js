@@ -12,7 +12,6 @@ const uploads = document.getElementsByClassName("list-elem");
 
             return res.json();
         }).then((res) => {
-            console.log(res);
             if(res.success) upload.remove();
         });
     });

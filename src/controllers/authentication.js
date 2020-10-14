@@ -83,16 +83,15 @@ class Authentication {
             const id = req.session.user_id;
             if(id || !_config.required) {
                 if(id) {
-                    req.id = id;
                     req.user = await this.deserialize(id, _config, this);
                     if(req.user instanceof Error) {
                         _config.error(req.user);
                         return;
                     }
-                } else req.id = null;
+                } else req.user.id = null;
                 _config.success();
             } else {
-                req.id = null;
+                req.user.id = null;
                 _config.error(Error("Not authorized"));
             }
         }

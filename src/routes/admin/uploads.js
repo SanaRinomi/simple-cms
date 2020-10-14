@@ -5,10 +5,11 @@ const router = express.Router();
 const {PostUpload, Uploads} = require("../../controllers/dbMain");
 
 router.get("/uploads/", async (req, res) => {
-    const uploads = await Promise.all((await Uploads.getAll(["path", "id", "title", "description"])).data.map(async v => {
+    const dbUploads = await Uploads.getAll(["path", "id", "title", "description"]);
+    const uploads = dbUploads.success ? await Promise.all(dbUploads.data.map(async v => {
         const linked = await PostUpload.getLinked("posts", v.id);
         return {title: v.title, id: v.id, url: `/upload/${v.path}`, description: v.description, linked: linked.success}
-    }));
+    })) : null;
     res.render("admin/uploads", {page: {title: "Uploads - Admin", posts: uploads, scripts: ["/js/uploadsManage.js"]}, website, flash: flash(req)});
 });
 

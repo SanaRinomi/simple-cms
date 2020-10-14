@@ -54,3 +54,6 @@ Post titles, descriptions and thumbnails can now be edited in the post editor, a
 Categories are now listed and can be created. Category descriptions and names can be changed from the category editor.
 
 Table class can now update the "Last modified" column when the column is specified and an upsert has occured.
+
+## 14th of October 2020
+Deviated from the intented goal of this stream and ended up redoing the database as well as doing some clean up here and there while adding some more functionality to our DBTable class;

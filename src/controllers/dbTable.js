@@ -1,5 +1,61 @@
 const { insert } = require("./dbKnex");
 const pg = require("./dbKnex");
+
+class Cache {
+    constructor(TTL = 120) {
+        this.map = new Map();
+        this.TTL = TTL;
+    }
+
+    fetch(id, filter) {
+        const cache = this.map.get(id);
+
+        if(filter) {
+            const filteredCache = this.fetch({id, filter: filter.join("_")});
+
+            if(filteredCache && (filteredCache.time - Date.now()) > 0) return filteredCache.data;
+            if(!filteredCache && !cache) return null;
+            else if((cache.time - Date.now()) > 0){
+                let arr = [];
+
+                for (let i = 0; i < cache.data.length; i++) {
+                    const cachedElem = cache.data[i];
+                    let obj = {};
+
+                    for (let i = 0; i < filter.length; i++) {
+                        const val = filter[i];
+                        obj[val] = cachedElem[val];
+                    }
+
+                    arr.push(obj);
+                }
+
+                this.add(id, arr, filter);
+                return arr;
+            } else {
+                this.delete(id);
+                return null;
+            }
+        } else {
+            if(!cache) return null;
+            else if((cache.time - Date.now()) < 0) {
+                this.delete(id);
+                return null;
+            }
+            else return cache.data;
+        }
+    }
+
+    add(id, data, filter) {
+        const now = new Date();
+        this.map.set(filter ? {id, filter: filter.join("_")} : id , {time: new Date(now.getTime() + (this.TTL * 1000)), data});
+    }
+
+    delete(id) {
+        this.map.delete(id);
+    }
+}
+
 class DBTable {
     constructor(tablename, table = function(table){
         table.bigInteger("id").unsigned().primary();
@@ -8,6 +64,8 @@ class DBTable {
         this._table = table;
         this._generatedID = false;
         this._timestamp = null;
+        this._cache = false;
+        this._CacheObj = new Cache();
         this.create();
     }
 
@@ -39,9 +97,15 @@ class DBTable {
     }
 
     async get(id, data, returnArray = false) {
-        let res = await pg.from(this._name).select(data).where(typeof id === "object" ? id : {id});
-        if(res.length && res[0])
+        let cache;
+        
+        if(this._cache) cache = this._CacheObj.fetch(id, data);
+        let res = cache ? cache : await pg.from(this._name).select(data).where(typeof id === "object" ? id : {id});
+        
+        if(res.length && res[0]) {
+            if(this._cache && !cache) this._CacheObj.add(id, res, data);
             return {id: id, success: true, data: returnArray ? res : res[0]};
+        }
         else return {id: id, success: false};
     }
 
@@ -53,8 +117,10 @@ class DBTable {
     }
 
     async upsert(id, data = {}) {
-        let res;
-        if(id !== null) res = await pg.from(this._name).select(!this._generatedID && typeof id === "object" ? Object.keys(id) : ["id"]).where(typeof id === "object" ? id : {id});
+        let res, cache;
+        
+        if(this._cache && id !== null) cache = this._CacheObj.fetch(id);
+        if(id !== null) res = cache ? cache : await pg.from(this._name).select(!this._generatedID && typeof id === "object" ? Object.keys(id) : ["id"]).where(typeof id === "object" ? id : {id});
 
         for (const key in data) {
             if (data.hasOwnProperty(key)) {
@@ -106,6 +172,7 @@ class LinkingTable extends DBTable {
         });
         this.refX = {name: referenceXName, link: referenceXLink, table: referenceXLink.split(".").shift()};
         this.refY = {name: referenceYName, link: referenceYLink, table: referenceYLink.split(".").shift()};
+        this._cache = true;
     }
 
     insert(data) {

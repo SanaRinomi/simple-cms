@@ -4,6 +4,7 @@
     <input type="text" name="slug" id="new-slug">
     <label for="title">Post Title</label>
     <input type="text" name="title" id="new-title">
+    <input type="checkbox" name="gen-slug" id="new-generate-slug">
 
     <button type="submit">Submit</button>
 </form>
@@ -12,11 +13,12 @@
     <header>
         <h2>Posts</h2>
     </header>
+{{#if page.posts}}
 {{#forEach page.posts}}
     <section class="list-elem" slug="{{slug}}">
         <a href="/admin/posts/{{slug}}" class="list-link">
             <section style="display: flex; flex-direction: row;">
-                <img src="{{thumbnail.url}}" alt="{{thumbnail.description}}" height="100" width="100" style="padding: 5px;">
+                {{#if thumbnail}}<img src="/uploads/id/{{thumbnail.id}}" alt="{{thumbnail.description}}" height="100" width="100" style="padding: 5px;">{{/if}}
                 <h4 style="padding: 5px;">{{title}}</h4>
             </section>
         </a>
@@ -27,4 +29,5 @@
         <a href="/posts/{{slug}}"><button class="button-goto">View Post as User</button></a>
     </section>
 {{/forEach}}
+{{/if}}
 </article>

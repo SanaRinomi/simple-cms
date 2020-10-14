@@ -1,7 +1,7 @@
 <form action="/upload/avatar" method="post" enctype="multipart/form-data" style="display: flex; flex-direction: column;">
     <title>Avatar</title>
     <h3>Avatar</h3>
-    <img src="{{profile.images.avatar.url}}" alt="{{user.username}}" height="250" width="250">
+    {{#if profile.pfp}}<img src="/uploads/id/{{profile.pfp}}" alt="{{user.username}}'s Current Profile Picture'" height="250" width="250">{{/if}}
     <label for="avatar">Upload new Avatar</label>
     <input type="file" name="avatar" id="avatar">
     <button type="submit" style="width: min-content;">Submit</button>

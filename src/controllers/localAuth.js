@@ -1,7 +1,6 @@
 const {Authentication, Configuration} = require("./authentication");
 const {Users} = require("./dbMain");
 const { validationResult } = require('express-validator');
-const cache = new Map();
 
 class LocalAuthentication extends Authentication {
     constructor() {
@@ -15,26 +14,21 @@ class LocalAuthentication extends Authentication {
 
             const isPass = Authentication.checkHash(getQuery.data.salt, getQuery.data.password, body.password);
             if(isPass) 
-                return {id: getQuery.data.id, data: {isAdmin: getQuery.data.is_admin, isConfirmed: getQuery.data.is_confirmed, email: getQuery.data.email}};
+                return {id: getQuery.data.id, data: getQuery.data};
             else return new Error("Password incorrect");
         };
 
         const serialize = (id, data, config, auth) => {
-            cache.set(id, data);
+            return;
         }
 
         const deserialize = async (id, config, auth) => {
-            let data = cache.get(id);
-            if(!data) {
-                const query = await Users.get(id);
-                if(!query.success) {
-                    config.error(new Error("Failed to retrieve user data"));
-                    return;
-                }
-                data = {isAdmin: query.data.is_admin, isConfirmed: query.data.is_confirmed, email: query.data.email, username: query.data.username};
-                cache.set(id, data);
+            const query = await Users.get(id);
+            if(!query.success) {
+                config.error(new Error("Failed to retrieve user data"));
+                return;
             }
-            return data;
+            return query.data;
         } 
 
         super(method, serialize, deserialize);
@@ -78,9 +72,8 @@ class LocalAuthentication extends Authentication {
             const query = await Users.upsert(null, {username: body.username, email: body.email, password: pass_hash.key, salt: pass_hash.salt});
             if(query.success) {
                 req.session.user_id = query.data.id;
-                req.id = query.data.id;
-                req.user = {isAdmin: false, isConfirmed: false, email: body.email, username: body.username}
-                this.serialize(req.id, req.user);
+                req.user = query.data;
+                this.serialize(req.user.id, req.user);
                 _config.success();
             } else _config.error(new Error("Query failed"));
         }

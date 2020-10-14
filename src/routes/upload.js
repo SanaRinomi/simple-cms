@@ -84,6 +84,7 @@ router.get("/:file", async (req, res, next) => {
 
 router.get("/id/:id", async (req, res, next) => {
     let dbres = await Uploads.get(req.params.id);
+    dbres;
     if(!dbres.success || !fs.existsSync(path.join(uploadPath, dbres.data.path))) {
         let page = {
             title: "404"
@@ -112,7 +113,7 @@ router.get("/id/:id", async (req, res, next) => {
 });
 
 router.post("/", auth.isLoggedIn({redirectFailure: "/json"}), (req, res, next) => {
-    if(req.user.isAdmin){
+    if(req.user.is_admin){
         next();
     }
     else {
@@ -200,7 +201,7 @@ router.post("/avatar", auth.isLoggedIn({redirectFailure: "/json"}), upload.singl
 });
 
 router.delete("/id/:id", auth.isLoggedIn({redirectFailure: "/json"}), (req, res, next) => {
-    if(req.user.isAdmin){
+    if(req.user.is_admin){
         next();
     }
     else {
@@ -215,9 +216,7 @@ router.delete("/id/:id", auth.isLoggedIn({redirectFailure: "/json"}), (req, res,
     }
 
     let linksDel = await PostUpload.removeAllLinked("posts", req.params.id);
-    console.log(linksDel);
     let dbdel = await Uploads.del(req.params.id);
-    console.log(dbdel);
     if(dbdel) {
         fs.unlink(path.join(uploadPath, dbres.data.path), (err) => {
             if(err) {
