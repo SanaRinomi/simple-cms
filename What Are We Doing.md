@@ -61,5 +61,7 @@ Table class can now update the "Last modified" column when the column is specifi
 ## 14th of October 2020
 Deviated from the intented goal of this stream and ended up redoing the database as well as doing some clean up here and there while adding some more functionality to our DBTable class;
 
-## 19th of OCtober 2020
+## 19th of October 2020
 At the start of the stream, we set up the Trello board of the project and linked it here as well as in README.md
+
+We can link posts to categories and remove links when required. Added categories and authors to post details. And categories list posts linked to them.

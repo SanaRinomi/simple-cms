@@ -213,6 +213,9 @@ router.delete("/id/:id", auth.isLoggedIn({redirectFailure: "/json"}), (req, res,
     if(!dbres.success || !fs.existsSync(path.join(uploadPath, dbres.data.path))) {
         res.status(404).json({success: false, reason: "Resource not found"});
         return;
+    } else if (dbres.data.default_post_thumbnail || dbres.data.default_pfc || dbres.data.default_pfp) {
+        res.status(400).json({success: false, reason: `Resource set to default ${dbres.data.default_post_thumbnail ? "post thumbnail" : dbres.data.default_pfc ? "profile banner" : "profile picture"}`});
+        return;
     }
 
     let linksDel = await PostUpload.removeAllLinked("posts", req.params.id);
@@ -220,7 +223,6 @@ router.delete("/id/:id", auth.isLoggedIn({redirectFailure: "/json"}), (req, res,
     if(dbdel) {
         fs.unlink(path.join(uploadPath, dbres.data.path), (err) => {
             if(err) {
-                console.error(err);
                 res.status(500).json({success: false, reason: "File failed to delete from file system"});
             } else res.json({success: true});
         });

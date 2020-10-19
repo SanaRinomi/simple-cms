@@ -91,7 +91,6 @@ class Authentication {
                 } else req.user.id = null;
                 _config.success();
             } else {
-                req.user.id = null;
                 _config.error(Error("Not authorized"));
             }
         }

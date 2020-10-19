@@ -1,8 +1,12 @@
-{{#forEach post.content}}
+<h2>{{post.title}}</h2>
+
+{{#if post.content}}{{#forEach post.content}}
     {{#eq type "markdown"}}
         {{#markdown}}{{data}}{{/markdown}}
     {{/eq}}
     {{#eq type "img"}}
         <img src="{{data}}" alt="">
     {{/eq}}
-{{/forEach}}
+{{/forEach}}{{else}}
+<h3>Post is Empty</h3>
+{{/if}}

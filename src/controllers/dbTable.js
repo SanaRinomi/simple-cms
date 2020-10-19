@@ -221,7 +221,8 @@ class LinkingTable extends DBTable {
             let obj = {};
             obj[this.refX.name] = idX;
             obj[this.refY.name] = idY;
-            return await this.insert(obj);
+            const check = await this.get(obj);
+            return check.success ? {success: true} : await this.insert(obj);
         }
     }
 

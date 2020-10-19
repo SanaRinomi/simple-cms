@@ -44,7 +44,7 @@ class ProfileTable extends Table {
     async getBySlug(slug) {
         const dbQuery = await this.get({slug});
         if(dbQuery && dbQuery.success)
-            return dbQuery.data;
+            return dbQuery;
         else return;
     }
 }
@@ -72,7 +72,7 @@ class CatTable extends Table {
     async getBySlug(slug) {
         const dbQuery = await this.get({slug});
         if(dbQuery && dbQuery.success)
-            return dbQuery.data;
+            return dbQuery;
         else return;
     }
 
@@ -111,7 +111,7 @@ class PostTable extends Table {
     async getBySlug(slug) {
         const dbQuery = await this.get({slug});
         if(dbQuery && dbQuery.success)
-            return dbQuery.data;
+            return dbQuery;
         else return;
     }
 
@@ -127,8 +127,8 @@ class PostTable extends Table {
 
             const dbQuery = await super.insert({slug, ...data}, ["id"]);
             if(dbQuery && dbQuery.success)
-                return dbQuery.data[0].id;
-            else return null;
+                return {success: true, data: dbQuery.data[0].id};
+            else return {success: false};
         };
     }
 }
@@ -223,7 +223,20 @@ Uploads.get(1).then(async v => {
             name: "default",
             title: "Default",
             path: "default.png",
-            mime: "image/png"
+            mime: "image/png",
+            default_pfp: true,
+            default_pfc: true,
+            default_post_thumbnail: true
+        });
+    }
+});
+
+Categories.get({default: true}).then(async v => {
+    if(!v.success) {
+        await Categories.insert("all", {
+            name: "All",
+            description: "Category that contains all posts.",
+            default: true
         });
     }
 });

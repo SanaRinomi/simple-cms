@@ -165,7 +165,7 @@ document.getElementById("button-delete").addEventListener("click", () => {
     fetch(`/admin/categories/${slug}`, {
         method: "DELETE"
     }).then((res) => {
-        if(!res.ok) del.innerHTML = "Delete Failed";
+        if(!res.ok) document.getElementById("button-delete").innerHTML = "Delete Failed";
 
         return res.json();
     }).then((res) => {

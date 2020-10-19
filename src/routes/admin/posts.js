@@ -2,7 +2,7 @@ const express = require("express");
 const {website} = require("../../controllers/constants");
 const flash = require("smol-flash");
 const router = express.Router();
-const {Posts, PostUpload} = require("../../controllers/dbMain");
+const {Posts, PostUpload, Categories, PostCategory, Uploads, PostProfile, Profiles} = require("../../controllers/dbMain");
 const { body, validationResult } = require('express-validator');
 
 router.get("/posts/", async (req, res) => {
@@ -13,11 +13,17 @@ router.get("/posts/", async (req, res) => {
 });
 
 router.get("/posts/:slug", async (req, res, next) => {
-    let post = await Posts.get({slug: req.params.slug});
+    const post = await Posts.get({slug: req.params.slug});
     if(!post.success)
         next(new Error("Post doesn't exist!"));
-    else
-        res.render("admin/post", {page: {title: `${post.data.title} - Admin`, scripts: ["/js/dropzone.min.js", "/js/postGen.js"]}, website, flash: flash(req), post: post.data});
+    else{
+        const linkedCats = await PostCategory.getLinked("categories", post.data.id); 
+        const linkedAuthors = await PostProfile.getLinked("profiles", post.data.id);
+        
+        const categories = linkedCats.success ? (await Promise.all(linkedCats.data.map(async v => {const cat = await Categories.get(v); return cat.success ? cat.data : null;}))).filter(v => v !== null) : [];
+        const authors = linkedAuthors.success ? (await Promise.all(linkedAuthors.data.map(async v => {const author = await Profiles.get({user_id: v}); return author.success ? author.data : null;}))).filter(v => v !== null) : [];
+        res.render("admin/post", {page: {title: `${post.data.title} - Admin`, scripts: ["/js/dropzone.min.js", "/js/postGen.js"]}, website, flash: flash(req), post: post.data, categories, authors});
+    }
 });
 
 router.post("/posts/",
@@ -39,9 +45,19 @@ router.post("/posts/",
     if(post.success)
         return next(new Error("Post already exist!"));
 
-    const dbQuery = await Posts.insert({slug, title, thumbnail: {url: "https://images.unsplash.com/photo-1584126321240-539468f62369", description: "Close up image of a page of a random book"}}, ["id"]);
-    if(dbQuery.success)
+    const postPic = await Uploads.get({default_post_thumbnail: true});
+
+    const dbQuery = await Posts.insert(slug, {title, thumbnail: postPic.success ? postPic.data.id : 1}, ["id"]);
+    if(dbQuery.success){
+        const dbCatDef = await Categories.get({default: true});
+        if(dbCatDef.success) {
+            await PostCategory.link(dbQuery.data, dbCatDef.data.id);
+        }
+
+        await PostProfile.link(dbQuery.data, req.user.id);
+
         res.redirect(`/admin/posts/${slug}`);
+    }
     else res.json(dbQuery);
 });
 
@@ -89,6 +105,7 @@ router.post("/posts/:slug", [
         }
 
         if(Object.keys(dbQuery).length !== 0){
+            await PostProfile.link(post.data.id, req.user.id, true);
             dbQuery.edited_at = Date.now();
             res.json(await Posts.upsert(post.data.id, dbQuery))
         }
@@ -102,6 +119,7 @@ router.delete("/posts/:slug", async (req, res) => {
         res.status(404).json({success: false, reason: "Resource doesn't exist"});
     else {
         let uploads = await PostUpload.removeAllLinked("upload", post.data.id);
+        let categories = await PostCategory.removeAllLinked("categories", post.data.id);
         let postDel = await Posts.del(post.data.id);
 
         res.json({success: postDel});

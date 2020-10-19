@@ -85,7 +85,7 @@ async (req, res) => {
         }
     }
 
-    const dbRes = await Profiles.upsert(req.session.user_id, dbQuery)
+    const dbRes = await Profiles.upsert({user_id: req.session.user_id}, dbQuery)
     res.json(dbRes);
 });
 

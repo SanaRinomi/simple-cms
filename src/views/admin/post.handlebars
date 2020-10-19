@@ -44,7 +44,7 @@
         </tr>
         <tr>
             <td>Thumbnail</td>
-            <td class="editable-property" type="file" value="{{post.thumbnail.url}}" name="thumbnail"></td>
+            <td class="editable-property" type="file" value="{{post.thumbnail}}" name="thumbnail"></td>
         </tr>
         <tr>
             <td>Created At</td>
@@ -53,6 +53,14 @@
         <tr>
             <td>Last Modified</td>
             <td>{{date post.edited_at "DD MMMM YYYY HH:MM"}}</td>
+        </tr>
+        <tr>
+            <td>Categories</td>
+            <td>{{#forEach categories}}<a href="/admin/categories/{{slug}}">{{name}}</a>{{#unless isLast}}, {{/unless}}{{/forEach}}</td>
+        </tr>
+        <tr>
+            <td>Authors</td>
+            <td>{{#forEach authors}}<a href="/user/{{slug}}">{{#if public_name}}{{public_name}}{{else}}{{slug}}{{/if}}</a>{{#unless isLast}}, {{/unless}}{{/forEach}}</td>
         </tr>
     </table>
 </article>

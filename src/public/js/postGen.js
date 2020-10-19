@@ -224,19 +224,17 @@ const propertySubmit = function(property) {
                     createSetProperty(property);
                     return;
                 }
-                property.value = `/upload/${res.media[0].data.path}`;
-
-                let obj = JSON.stringify({url: `/upload/${res.media[0].data.path}`, description: "", id: res.media[0].data.id});
-
+                property.value = res.media[0].data.id;
                 fetch(`/admin/posts/${slug}`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/x-www-form-urlencoded"
                     },
-                    body: (encodeURIComponent(property.name) + "=" + encodeURIComponent(obj))
+                    body: (encodeURIComponent(property.name) + "=" + encodeURIComponent(res.media[0].data.id))
                 }).then(res => {
                     if(!res.ok) console.error("Response failed");
-                    return res.json();
+
+                    return;
                 }).then(res => {
                     createSetProperty(property);
                 });
@@ -319,7 +317,7 @@ const createSetProperty = function(property) {
         case "file":
             let fileLink = document.createElement("a");
             fileLink.appendChild(document.createTextNode("View File"));
-            fileLink.href = property.value;
+            fileLink.href = `/upload/id/${property.value}`;
             property.elem.appendChild(fileLink);
             break;
         
