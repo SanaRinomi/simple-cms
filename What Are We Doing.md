@@ -65,3 +65,6 @@ Deviated from the intented goal of this stream and ended up redoing the database
 At the start of the stream, we set up the Trello board of the project and linked it here as well as in README.md
 
 We can link posts to categories and remove links when required. Added categories and authors to post details. And categories list posts linked to them.
+
+## 20th of October 2020
+Started a large-ish code clean up. Mainly moving code that would be repeated to functions.

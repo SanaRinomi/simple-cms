@@ -3,6 +3,7 @@ const {website} = require("../../controllers/constants");
 const flash = require("smol-flash");
 const router = express.Router();
 const {Posts, PostUpload, Categories, PostCategory, Uploads, PostProfile, Profiles} = require("../../controllers/dbMain");
+const {fetchPostJSON} = require("../../controllers/posts");
 const { body, validationResult } = require('express-validator');
 
 router.get("/posts/", async (req, res) => {
@@ -22,7 +23,10 @@ router.get("/posts/:slug", async (req, res, next) => {
         
         const categories = linkedCats.success ? (await Promise.all(linkedCats.data.map(async v => {const cat = await Categories.get(v); return cat.success ? cat.data : null;}))).filter(v => v !== null) : [];
         const authors = linkedAuthors.success ? (await Promise.all(linkedAuthors.data.map(async v => {const author = await Profiles.get({user_id: v}); return author.success ? author.data : null;}))).filter(v => v !== null) : [];
-        res.render("admin/post", {page: {title: `${post.data.title} - Admin`, scripts: ["/js/dropzone.min.js", "/js/postGen.js"]}, website, flash: flash(req), post: post.data, categories, authors});
+        
+        console.log(await fetchPostJSON(post.data));
+        
+        res.render("admin/post", {page: {title: `${post.data.title} - Admin`, scripts: ["/js/dropzone.min.js", "/js/postGen.js", "https://cdnjs.cloudflare.com/ajax/libs/markdown-it/12.0.1/markdown-it.min.js"]}, website, flash: flash(req), post: post.data, categories, authors});
     }
 });
 

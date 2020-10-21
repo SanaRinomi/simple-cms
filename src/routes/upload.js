@@ -10,6 +10,7 @@ const fs = require('fs');
 const validator = require("validator");
 const mime = require("mime");
 const {Uploads, Profiles, PostUpload} = require("../controllers/dbMain");
+const {isMIME} = require("../controllers/uploads");
 
 const uploadPath = path.join(process.cwd(), "upload");
 
@@ -138,7 +139,7 @@ router.post("/", auth.isLoggedIn({redirectFailure: "/json"}), (req, res, next) =
             });
 
             if(dbres.success)
-                data.media.push({success: true, data: {id: dbres.data[0].id, name:path.basename(content.filename, path.extname(content.filename)), title: path.basename(content.originalname, path.extname(content.originalname)), path: content.filename}});
+                data.media.push({success: true, data: {id: dbres.data[0].id, name:path.basename(content.filename, path.extname(content.filename)), title: path.basename(content.originalname, path.extname(content.originalname)), path: content.filename, description: null, ...isMIME(content.mimetype)}});
             else data.media.push({success: false, data: "Couldn't add to DB"});
         }));
 

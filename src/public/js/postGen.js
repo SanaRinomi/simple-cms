@@ -7,6 +7,29 @@ const sectionsContainer = document.getElementById("post-container");
 const slug = document.body.getAttribute("slug");
 let counter = 0;
 
+const uploadDataDefault = {
+    id: 1,
+    title: "",
+    path: "",
+    mime: "",
+    description: "",
+    type: "",
+    image: false,
+    video: false,
+    audio: false,
+    text: false,
+    application: false
+};
+
+const sectionData = (type, data) => {
+    if(typeof data === "string" && type === "upload") data = JSON.parse(data);
+
+    return {
+        type,
+        data: type === "upload" ? data ? {...uploadDataDefault, ...data} : {...uploadDataDefault} : data ? data : "",
+    };
+}
+
 let sectionButtons = (section) => {
     let copyButton = document.createElement("button");
     copyButton.classList.add("section-action");
@@ -52,24 +75,87 @@ let sectionButtons = (section) => {
     section.appendChild(killButton);
 }
 
+const submitSections = function() {
+
+}
+
+const createNewSection = function() {
+
+}
+
+const createViewSection = function() {
+
+}
+
+const createEditSection = function() {
+
+}
+
+const setupSection = function(section) {
+    let sectData = {};
+    
+    const type = section.getAttribute("section-type");
+    let data = section.innerHTML;
+
+    sectData.data = sectionData(type, data);
+    sectData.elem = section;
+
+    console.log(sectData);
+};
+
+
+
 [...document.getElementsByClassName("loaded")].forEach(v => {
+    setupSection(v)
     const type = v.getAttribute("section-type");
     v.removeAttribute("section-type");
-    const data = v.innerHTML;
+    let data = v.innerHTML;
     v.innerHTML = null;
     v.classList.remove("loaded");
     let child;
 
     switch (type) {
-        case "img":
-            child = document.createElement("img");
+        case "upload":
+            data = JSON.parse(data);
+            switch(data.type) {
+                case "image":
+                    child = document.createElement("img");
+                    child.src = `/upload/${data.path}`;
+                    child.setAttribute("alt", data.description);
+                    break;
+
+                case "video":
+                    child = document.createElement("video");
+                    let vidSrc = document.createElement("source");
+                    vidSrc.src = `/upload/${data.path}`;
+                    vidSrc.type = data.mime;
+                    child.setAttribute("alt", data.description);
+                    child.setAttribute("controls", true);
+                    child.appendChild(vidSrc);
+                    break;
+
+                case "audio":
+                    child = document.createElement("audio");
+                    let audioSrc = document.createElement("source");
+                    audioSrc.src = `/upload/${data.path}`;
+                    audioSrc.type = data.mime;
+                    child.setAttribute("alt", data.description);
+                    child.setAttribute("controls", true);
+                    child.appendChild(audioSrc);
+                    break;
+
+                case "text":
+                case "application":
+                    child = document.createElement("a");
+                    child.innerHTML = `Open File: ${data.title}`;
+                    child.href = `/upload/${data.path}`;
+                    break;
+            }
+
             child.setAttribute("section-type", type);
             child.classList.add("post-section");
-            child.src = data;
-            child.setAttribute("content-id", v.getAttribute("content-id"));
-            v.removeAttribute("content-id");
+            child.setAttribute("content-id", data.id);
             v.appendChild(child);
-            child.value = data;
             break;
         case "markdown":
         default:
@@ -100,7 +186,7 @@ let sendPost = () => {
         const type = section.getAttribute("section-type") || "markdown";
         data.push(encodeURIComponent(`content[${i}][type]`) + "=" + encodeURIComponent(type));
         switch(type) {
-            case "img":
+            case "upload":
                 data.push(encodeURIComponent(`content[${i}][data]`) + "=" + encodeURIComponent(section.src));
                 data.push(encodeURIComponent(`content[${i}][id]`) + "=" + encodeURIComponent(section.getAttribute("content-id")));
                 break;
@@ -140,7 +226,7 @@ sectCreate.submit.addEventListener("click", (e) => {
             child.classList.add("post-section");
             newSect.appendChild(child);
             break;
-        case "img":
+        case "upload":
             child = document.createElement("form");
             newSect.appendChild(child);
             const imgSelect = document.createElement("input");
@@ -148,7 +234,7 @@ sectCreate.submit.addEventListener("click", (e) => {
             imgSelect.classList.add("media");
             const imgSubmit = document.createElement("button");
             imgSubmit.type = "submit";
-            imgSubmit.innerText = "Upload Image";
+            imgSubmit.innerText = "Upload File";
             child.appendChild(imgSelect);
             child.appendChild(imgSubmit);
             child.addEventListener("submit", (e) => {
