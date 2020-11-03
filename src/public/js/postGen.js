@@ -2,6 +2,7 @@ Dropzone.autoDiscover = false;
 
 // Post Content
 
+const md = window.markdownit();
 const submit = document.getElementById("post-submit");
 const sectionsContainer = document.getElementById("post-container");
 const slug = document.body.getAttribute("slug");
@@ -18,95 +19,354 @@ const uploadDataDefault = {
     video: false,
     audio: false,
     text: false,
-    application: false
+    application: false,
+    external: false
 };
 
-const sectionData = (type, data) => {
-    if(typeof data === "string" && type === "upload") data = JSON.parse(data);
+function Section(sectManager, position, type, data = null, elem = null) {
+    this.sectManager = sectManager;
+    this.position = position;
+    this.type = type;
+    this.data = type === "upload" ? data ? typeof data === "string" ? {...uploadDataDefault, ...JSON.parse(data)} : {...uploadDataDefault, ...data} : {...uploadDataDefault} : data ? data : "";
+    this.elem = elem;
+    this.dataElem = document.createElement("div");
+    this.actionsElem = document.createElement("div");
 
-    return {
-        type,
-        data: type === "upload" ? data ? {...uploadDataDefault, ...data} : {...uploadDataDefault} : data ? data : "",
-    };
-}
+    if(elem == null) {
+        const sectionElem = document.createElement("section");
+        sectManager.sectionContainer.appendChild(sectionElem);
+        this.elem = sectionElem;
+    } else this.elem.innerHTML = null;
 
-let sectionButtons = (section) => {
+    this.elem.appendChild(this.dataElem);
+    this.elem.appendChild(this.actionsElem);
+
+    if(data) this.view();
+    else this.edit();
+
+    const section = this;
     let copyButton = document.createElement("button");
     copyButton.classList.add("section-action");
     copyButton.innerText = "Duplicate";
     copyButton.addEventListener("click", (e) => {
-        const parent = e.target.parentNode;
-        const clone = parent.cloneNode(true);
-        parent.insertAdjacentElement("afterend", clone);
-        [...clone.getElementsByClassName("section-action")].forEach(v => {
-            v.remove();
-        });
-        sectionButtons(clone);
+        section.sectManager.clone(section.position);
     });
-    section.appendChild(copyButton);
+    this.elem.appendChild(copyButton);
 
     let moveUpButton = document.createElement("button");
     moveUpButton.classList.add("section-action");
     moveUpButton.innerText = "/\\";
     moveUpButton.addEventListener("click", (e) => {
-        const parent = e.target.parentNode;
-        const sibling = parent.previousElementSibling;
-        sibling.insertAdjacentElement("beforebegin", parent);
+        section.moveUp();
     });
-    section.appendChild(moveUpButton);
+    this.elem.appendChild(moveUpButton);
 
     let moveDownButton = document.createElement("button");
     moveDownButton.classList.add("section-action");
     moveDownButton.innerText = "\\/";
     moveDownButton.addEventListener("click", (e) => {
-        const parent = e.target.parentNode;
-        const sibling = parent.nextElementSibling;
-        sibling.insertAdjacentElement("afterend", parent);
+        section.moveDown();
     });
-    section.appendChild(moveDownButton);
+    this.elem.appendChild(moveDownButton);
 
     let killButton = document.createElement("button");
     killButton.classList.add("section-action");
     killButton.innerText = "Remove";
     killButton.addEventListener("click", (e) => {
-        const parent = e.target.parentNode;
-        parent.remove();
+        section.remove();
     });
-    section.appendChild(killButton);
+    this.elem.appendChild(killButton);
 }
 
-const submitSections = function() {
-
+Section.prototype.resetView = function() {
+    const newDiv = document.createElement("div");
+    this.dataElem.insertAdjacentElement("afterend", newDiv);
+    this.dataElem.remove();
+    this.dataElem = newDiv;
 }
 
-const createNewSection = function() {
+Section.prototype.view = function() {
+    this.resetView();
 
-}
+    const section = this;
+    this.dataElem.addEventListener("dblclick", function() {
+        section.edit();
+    })
 
-const createViewSection = function() {
-
-}
-
-const createEditSection = function() {
-
-}
-
-const setupSection = function(section) {
-    let sectData = {};
+    switch (this.type) {
+        case "markdown":
+            const render = md.render(this.data);
+            this.dataElem.innerHTML = render;
+            break;
     
-    const type = section.getAttribute("section-type");
-    let data = section.innerHTML;
+        case "upload":
+            let child;
+            switch(this.data.type) {
+                case "image":
+                    child = document.createElement("img");
+                    child.src = `/upload/${this.data.path}`;
+                    child.setAttribute("alt", this.data.description);
+                    break;
 
-    sectData.data = sectionData(type, data);
-    sectData.elem = section;
+                case "video":
+                    child = document.createElement("video");
+                    let vidSrc = document.createElement("source");
+                    vidSrc.src = `/upload/${this.data.path}`;
+                    vidSrc.type = this.data.mime;
+                    child.setAttribute("alt", this.data.description);
+                    child.setAttribute("controls", true);
+                    child.appendChild(vidSrc);
+                    break;
 
-    console.log(sectData);
+                case "audio":
+                    child = document.createElement("audio");
+                    let audioSrc = document.createElement("source");
+                    audioSrc.src = `/upload/${this.data.path}`;
+                    audioSrc.type = this.data.mime;
+                    child.setAttribute("alt", this.data.description);
+                    child.setAttribute("controls", true);
+                    child.appendChild(audioSrc);
+                    break;
+
+                case "text":
+                case "application":
+                    child = document.createElement("a");
+                    child.innerHTML = `Open File: ${this.data.title}`;
+                    child.href = `/upload/${this.data.path}`;
+                    break;
+            }
+            this.dataElem.appendChild(child);
+            break;
+    }
+}
+
+Section.prototype.edit = function() {
+    this.resetView();
+
+    const section = this;
+
+    const form = document.createElement("div");
+    const formActions = document.createElement("div");
+    const cancel = document.createElement("button");
+    const submit = document.createElement("button");
+
+    let formValue;
+
+    cancel.innerText = "Cancel";
+    cancel.addEventListener("click", () => {
+        section.view();
+    });
+
+    submit.innerText = "Submit";
+    submit.addEventListener("click", () => {
+        section.submit(formValue);
+    });
+
+    formActions.appendChild(cancel);
+    formActions.appendChild(submit);
+
+    switch (this.type) {
+        case "markdown":
+            const mdEdit = document.createElement("textarea");
+            mdEdit.value = this.data;
+            mdEdit.addEventListener("change", () => {
+                formValue = mdEdit.value;
+            });
+            form.appendChild(mdEdit);
+            break;
+    
+        case "upload":
+            const uploadEdit = document.createElement("input");
+            uploadEdit.type = "file";
+            uploadEdit.addEventListener("change", () => {
+                formValue = uploadEdit.files;
+            })
+            form.appendChild(uploadEdit);
+            break;
+    }
+
+    this.dataElem.appendChild(form);
+    this.dataElem.appendChild(formActions);
+}
+
+Section.prototype.submit = function(data) {
+    if(!data && !this.data) {this.remove(false); return;}
+    else if(!data) {this.view(); return;}
+
+    switch (this.type) {
+        case "upload":
+            let fileData = new FormData();
+            if(data) [...data].forEach(v => {
+                fileData.append(`media`, v, v.name);
+            });
+            
+            fetch("/upload", {
+                method: "POST",
+                body: fileData
+            }).then(res => {
+                if(res.ok) return res.json();
+                else return;
+            }).then(res => {
+                if(!res || res.error) {
+                    console.error(res);
+                    this.view();
+                    return;
+                }
+                
+                this.data = {...res.media[0].data, external: false};
+                this.view();
+                this.sectManager.submit();
+            });
+            break;
+        
+        case "markdown":
+        default:
+            this.data = data;
+            this.view();
+            this.sectManager.submit();
+            break;
+    }
+}
+
+Section.prototype.moveUp = function() {
+    this.sectManager.move(this.position, this.position-1);
+}
+
+Section.prototype.moveDown = function() {
+    this.sectManager.move(this.position, this.position+1);
+}
+
+Section.prototype.remove = function(register = true) {
+    this.elem.remove();
+    this.data = null;
+    this.type = null;
+    if(register) this.sectManager.remove(this.position);
+}
+
+Section.clone = function(section) {
+    const sectManager = section.sectManager;
+    const position = section.position+1;
+    const type = section.type;
+    const data = section.data;
+    const elem = document.createElement("section");
+    section.elem.insertAdjacentElement("afterend", elem);
+
+    return new Section(sectManager, position, type, data, elem);
+}
+
+function SectionManager(sectionCoantainer, preloadedSects = []) {
+    this.sections = [];
+    this.sectionContainer = sectionCoantainer;
+    
+    for (let i = 0; i < preloadedSects.length; i++) {
+        const section = preloadedSects[i];
+        
+        const type = section.getAttribute("section-type");
+        let data = section.innerHTML;
+
+        this.register(type, data, section);
+    }
 };
 
+SectionManager.prototype.remove = function(position) {
+    this.sections.splice(position, 1);
 
+    for (let i = position; i < this.sections.length; i++) {
+        this.sections[i].position = i;
+    }
+    
+    this.submit();
+}
 
+SectionManager.prototype.move = function(oldPos, newPos) {
+    if(newPos < 0 || newPos >= this.sections.length || oldPos == newPos) return;
+
+    let section = this.sections[oldPos];
+    section.position = newPos;
+    this.sections.splice(oldPos, 1);
+    this.sections.splice(newPos, 0, section);
+
+    if(oldPos > newPos) {
+        this.sections[newPos+1].elem.insertAdjacentElement("beforebegin", section.elem);
+        for (let i = newPos+1; i < this.sections.length; i++) {
+            this.sections[i].position = i;
+        }
+    } else {
+        this.sections[newPos-1].elem.insertAdjacentElement("afterend", section.elem);
+        for (let i = newPos-1; i >= this.sections.length; i--) {
+            this.sections[i].position = i;
+        }
+    }
+
+    this.submit();
+}
+
+SectionManager.prototype.register = function(type, data, elem = null) {
+    let section = new Section(this, this.sections.length, type, data, elem);
+
+    this.sections.push(section);
+}
+
+SectionManager.prototype.clone = function(position) {
+    if(position < 0 && position >= this.sections.length) return;
+
+    const refElem = this.sections[position];
+    const cloneElem = Section.clone(refElem);
+
+    this.sections.splice(position+1, 0, cloneElem);
+
+    for (let i = position+2; i < this.sections.length; i++) {
+        this.sections[i].position = i;
+    }
+}
+
+SectionManager.prototype.submit = function() {
+    let data = [];
+
+    for (let i = 0; i < this.sections.length; i++) {
+        const section = this.sections[i];
+        const type = section.type;
+        data.push(encodeURIComponent(`content[${i}][type]`) + "=" + encodeURIComponent(type));
+        switch(type) {
+            case "upload":
+                data.push(encodeURIComponent(`content[${i}][data]`) + "=" + encodeURIComponent(JSON.stringify({path: section.data.path, type: section.data.type, external: section.data.external})));
+                if(section.data.id) data.push(encodeURIComponent(`content[${i}][id]`) + "=" + encodeURIComponent(section.data.id));
+                break;
+            case "markdown":
+            default:
+                data.push(encodeURIComponent(`content[${i}][data]`) + "=" + encodeURIComponent(section.data));
+                break;
+        }
+    }
+
+    fetch(`/admin/posts/${slug}`,{
+        method: "POST",
+        body: data.join("&"),
+        credentials: 'same-origin',
+        headers: new Headers({"content-type": "application/x-www-form-urlencoded; charset=UTF-8"})
+    }).then((res) => {
+        console.log(`Form submitted: ${res.ok}`);
+        if(res.ok) return res.json();
+    }).then((res) => {
+    });
+}
+
+var Manager = new SectionManager(sectionsContainer, [...document.getElementsByClassName("loaded")]);
+
+const sectCreate = {
+    form: document.getElementById("section-select"),
+    select: document.getElementById("s-sect-type"),
+    submit: document.getElementById("s-create")
+};
+
+sectCreate.submit.addEventListener("click", (e) => {
+    e.preventDefault();
+    const type = sectCreate.select.options[sectCreate.select.selectedIndex].value;
+    Manager.register(type);
+});
+
+/**
 [...document.getElementsByClassName("loaded")].forEach(v => {
-    setupSection(v)
     const type = v.getAttribute("section-type");
     v.removeAttribute("section-type");
     let data = v.innerHTML;
@@ -166,8 +426,6 @@ const setupSection = function(section) {
             child.value = data;
             break;
     }
-
-    sectionButtons(v);
 });
 
 
@@ -279,6 +537,8 @@ sectCreate.submit.addEventListener("click", (e) => {
 })
 
 submit.addEventListener("click", sendPost);
+
+*/
 
 // Post Details
 const detailsSect = document.getElementById("post-details");

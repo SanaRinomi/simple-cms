@@ -24,15 +24,15 @@ router.get("/posts/:slug", async (req, res, next) => {
         const categories = linkedCats.success ? (await Promise.all(linkedCats.data.map(async v => {const cat = await Categories.get(v); return cat.success ? cat.data : null;}))).filter(v => v !== null) : [];
         const authors = linkedAuthors.success ? (await Promise.all(linkedAuthors.data.map(async v => {const author = await Profiles.get({user_id: v}); return author.success ? author.data : null;}))).filter(v => v !== null) : [];
         
-        console.log(await fetchPostJSON(post.data));
+        const fetched = await fetchPostJSON(post.data);
         
-        res.render("admin/post", {page: {title: `${post.data.title} - Admin`, scripts: ["/js/dropzone.min.js", "/js/postGen.js", "https://cdnjs.cloudflare.com/ajax/libs/markdown-it/12.0.1/markdown-it.min.js"]}, website, flash: flash(req), post: post.data, categories, authors});
+        res.render("admin/post", {page: {title: `${post.data.title} - Admin`, scripts: ["https://cdnjs.cloudflare.com/ajax/libs/markdown-it/12.0.1/markdown-it.min.js", "/js/dropzone.min.js", "/js/postGen.js"]}, website, flash: flash(req), post: fetched, categories, authors});
     }
 });
 
 router.post("/posts/",
 [
-    body("slug").isString().escape(),
+    body("slug").isString().escape().optional({checkFalsy: true, nullable: true}),
     body("title").isString().escape()
 ], async(req, res, next) => {
     const errors = validationResult(req);
@@ -42,7 +42,7 @@ router.post("/posts/",
         return;
     }
 
-    const slug = req.body.slug.toLowerCase().split(" ").join("_");
+    const slug = req.body.slug ? req.body.slug.toLowerCase().split(" ").join("_") : req.body.title.toLowerCase().split(" ").join("_");
     const title = req.body.title;
 
     let post = await Posts.get({slug});
@@ -98,8 +98,8 @@ router.post("/posts/:slug", [
                 case "content":
                     let filtered = value.filter(v => {return v.type && v.data});
                     if(filtered.length === 0) break;
-                    const imgs = filtered.filter(v => v.id);
-                    if(imgs && imgs.length) await PostUpload.link(post.data.id, imgs.map(v => v.id), false);
+                    const uploads = filtered.filter(v => v.type === "upload");
+                    if(uploads && uploads.length) await PostUpload.link(post.data.id, uploads.map(v => v.id), false);
                     dbQuery.content = filtered;
                     break;
             

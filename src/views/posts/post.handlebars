@@ -4,8 +4,10 @@
     {{#eq type "markdown"}}
         {{#markdown}}{{data}}{{/markdown}}
     {{/eq}}
-    {{#eq type "img"}}
-        <img src="{{data}}" alt="">
+    {{#eq type "upload"}}
+        {{#eq data.type "image"}}
+            <img src="/upload/{{data.path}}" alt="{{data.description}}">
+        {{/eq}}
     {{/eq}}
 {{/forEach}}{{else}}
 <h3>Post is Empty</h3>

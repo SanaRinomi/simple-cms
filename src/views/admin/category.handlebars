@@ -29,21 +29,26 @@
     </table>
 </article>
 
-<form action="/admin/categories/{{post.slug}}/no_i_dont" method="post">
-<input type="checkbox" name="add" id="">
-<button type="submit">submit</button>
+<form action="" method="post" id="add-posts" {{#not allPosts}}class="hidden"{{/not}}>
+<h3>Add Posts</h3>
+<select name="post" id="add-post-select">
+    {{#if allPosts}}{{#forEach allPosts}}
+    <option value="{{slug}}" id="{{slug}}-add" thumbnail="{{thumbnail}}">{{title}}</option>
+    {{/forEach}}{{/if}}
+</select>
+<button type="submit" id="add-post-submit">submit</button>
 </form>
 
 <h3>Category Delete</h3>
 <button id="button-delete">Delete</button>
 
-<article>
+<article id="posts">
     <h3>Linked Posts</h3>
     {{#if posts}}{{#forEach posts}}
-    <section>
+    <section class="post-listing" slug="{{slug}}">
         <a href="/admin/posts/{{slug}}" class="list-link">
             <section style="display: flex; flex-direction: row;">
-                {{#if thumbnail}}<img src="/upload/id/{{thumbnail}}" height="100" width="100" style="padding: 5px;">{{/if}}
+                {{#if thumbnail}}<img src="/upload/id/{{thumbnail}}" thumbnail="{{thumbnail}}" height="100" width="100" style="padding: 5px;">{{/if}}
                 <h4 style="padding: 5px;">{{title}}</h4>
             </section>
         </a>

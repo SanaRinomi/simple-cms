@@ -23,7 +23,7 @@ const fetchPostUploads = async function(post_id) {
     } return [];
 }
 
-const fetchPostJSON = async function(post) {
+const fetchPostJSON = async function(post, json = false) {
     const id = post.id;
     const categories = await fetchCategories(id);
     const authors = await fetchAuthors(id);
@@ -33,7 +33,7 @@ const fetchPostJSON = async function(post) {
         post.content = post.content.map(v => {
             if(v.type === "upload" || v.type === "img") {
                 const upload = uploads.find(vv => vv.id == v.id);
-                return {type: "upload", data: JSON.stringify(upload) || v.data};
+                return {type: "upload", data: json ? upload || JSON.parse(v.data) : JSON.stringify(upload) || v.data };
             } else return v;
         });
     }

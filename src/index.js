@@ -1,5 +1,6 @@
 const {port, settings, website} = require("./controllers/constants");
 const {Posts} = require("./controllers/dbMain");
+const {fetchPostJSON} = require("./controllers/posts");
 
 // Express
 const express = require("express"),
@@ -38,7 +39,7 @@ server.get("/posts/:slug", async (req, res) => {
     if(!post.success)
         next(new Error("Post doesn't exist!"));
     else
-        res.render("posts/post", {page: {title: `${post.data.title}`}, website, flash: flash(req), post: post.data});
+        res.render("posts/post", {page: {title: `${post.data.title}`}, website, flash: flash(req), post: await fetchPostJSON(post.data, true)});
 });
 
 // Authentication router - Deals with login, register and logout.

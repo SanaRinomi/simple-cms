@@ -6,7 +6,122 @@ const details = detailsSect.getElementsByClassName("editable-property");
 const emptyTextNode = document.createElement("b");
 let properties = [];
 
+const addPosts = document.getElementById("add-posts");
+const postList = document.getElementById("posts");
+
 emptyTextNode.appendChild(document.createTextNode("Empty"));
+
+function removePost(post, button, post_slug) {
+    button.addEventListener("click", (e) => {
+        e.preventDefault();
+
+        const body = ("add="+encodeURIComponent("off"));
+
+        fetch(`/admin/categories/${slug}/${post_slug}`, {method: "POST", headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        }, body }).then(res => {
+            if(res.ok) return res.json();
+            else return;
+        }).then(res => {
+            if(res.success) {
+                const options = document.getElementById("add-post-select");
+                const option = document.createElement("option");
+                const set_slug = post_slug;
+
+                const img = document.getElementsByTagName("img");
+                const src = img && img[0] ? img[0].getAttribute("thumbnail") : null; 
+
+                console.log(src);
+
+                option.value = set_slug;
+                option.id = set_slug+"-add";
+                option.innerText = document.getElementsByTagName("h4")[0].innerText;
+                if(src) option.setAttribute("thumbnail", src);
+
+                options.appendChild(option);
+                post.remove();
+            }
+        });
+    })
+}
+
+function addPostsEvent(form) {
+    form.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const options = document.getElementById("add-post-select");
+        const select = options.options[options.selectedIndex];
+
+        const body = ("add="+encodeURIComponent("on"));
+
+        fetch(`/admin/categories/${slug}/${select.value}`, {method: "POST", headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        }, body }).then(res => {
+            if(res.ok) return res.json();
+            else return;
+        }).then((res) => {
+            if(res && res.success) {
+                const ptitle = select.innerText;
+                const pslug = select.value;
+                const pthumbnail = select.getAttribute("thumbnail");
+
+                const section = document.createElement("section");
+                postList.appendChild(section);
+
+                const link = document.createElement("a");
+                link.href = "/admin/posts/"+pslug;
+                link.classList.add("list-link");
+                section.appendChild(link);
+
+                const container = document.createElement("section");
+                container.style = "display: flex; flex-direction: row;";
+                link.appendChild(container);
+
+                const img = pthumbnail ? document.createElement("img") : null;
+                if(img) {
+                    img.src = "/upload/id/"+pthumbnail;
+                    img.setAttribute("thumbnail", pthumbnail);
+                    img.height = 100;
+                    img.width = 100;
+                    img.style = "padding: 5px;";
+                    container.appendChild(img);
+                }
+
+                const titleElem = document.createElement("h4");
+                titleElem.innerText = ptitle;
+                titleElem.style = "padding: 5px;";
+                container.appendChild(titleElem);
+
+                const viewAs = document.createElement("a");
+                viewAs.href = "/posts/"+pslug;
+                section.appendChild(viewAs);
+
+                const unlinkButton = document.createElement("button");
+                unlinkButton.innerHTML = "Unlink";
+                unlinkButton.classList.add("button-unlink");
+                viewAs.appendChild(unlinkButton);
+
+                const viewAsButton = document.createElement("button");
+                viewAsButton.innerHTML = "View Post as User";
+                viewAsButton.classList.add("button-goto");
+                viewAs.appendChild(viewAsButton);
+
+                removePost(section, unlinkButton, pslug);
+
+                select.remove();
+            }
+        });
+    });
+}
+
+const listing = document.getElementsByClassName("post-listing");
+if(listing) [...listing].map(v => {
+    const unlink = v.getElementsByClassName("button-unlink")[0];
+    const slug = v.getAttribute("slug");
+    removePost(v, unlink, slug);
+})
+
+if(addPosts) addPostsEvent(addPosts)
 
 const propertySubmit = function(property) {
     const field = property.elem.getElementsByClassName("field")[0];
