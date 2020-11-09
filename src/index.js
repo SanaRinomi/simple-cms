@@ -1,6 +1,5 @@
 const {port, settings, website} = require("./controllers/constants");
-const {Posts} = require("./controllers/dbMain");
-const {fetchPostJSON} = require("./controllers/posts");
+const {Categories, PostCategory, Posts} = require("./controllers/dbMain");
 
 // Express
 const express = require("express"),
@@ -26,20 +25,31 @@ server.use(express.json());
 
 server.use(express.static('src/public'));
 
-server.get("/", (req, res) => {
-    res.render("index", {page: {title: "Index"}, website, flash: flash(req)})
+server.get("/", auth.isLoggedIn({required: false}), async (req, res) => {
+    const category = await Categories.get({default: true});
+    if(!category.success) {
+        next(new Error("Category doesn't exist"));
+        return;
+    }
+
+    const links = await PostCategory.getLinked("posts", category.data.id);
+    const posts = [...await Promise.all(links.data.map(async v => {
+        const post = await Posts.get(v);
+        if(post.success) {
+            const thumbnail = post.data.thumbnail;
+            return {
+                ...post.data,
+                thumbnail: {url:`/upload/id/${thumbnail}`, description: "Post's thumbnail"},
+                url: `/posts/${post.data.slug}`
+            }
+        } else null;
+    }))].filter(v => v !== null);
+
+    res.render("index", {page: {title: "Index", posts}, user: req.user || null, website, flash: flash(req)});
 });
 
 server.get("/json", (req, res) => {
     res.json(flash(req));
-});
-
-server.get("/posts/:slug", async (req, res) => {
-    let post = await Posts.get({slug: req.params.slug});
-    if(!post.success)
-        next(new Error("Post doesn't exist!"));
-    else
-        res.render("posts/post", {page: {title: `${post.data.title}`}, website, flash: flash(req), post: await fetchPostJSON(post.data, true)});
 });
 
 // Authentication router - Deals with login, register and logout.
@@ -51,6 +61,12 @@ server.use("/admin", require("./routes/admin"));
 // Me router - Current user profile and control.
 server.use("/me", require("./routes/me"));
 
+// Post router - Display and list all posts.
+server.use("/posts", require("./routes/posts"));
+
+// Category router - Display and list all categories.
+server.use("/category", require("./routes/categories"));
+
 // User router - Display profiles only to non admin users and control for admin users.
 server.use("/user", require("./routes/user"));
 
@@ -60,19 +76,19 @@ server.use("/upload", require("./routes/upload"));
 // Test router - For testing functionality. Comment out in prod.
 server.use("/test", require("./routes/tests"));
 
-server.use(function(req, res){
+server.use(auth.isLoggedIn({required: false}), function(req, res){
     const page = {
         title: "404"
     }
 	res.type('text/html');
 	res.status(404);
-	res.render('404', { page, website, flash: flash(req) });
+	res.render('404', { page, website, flash: flash(req), user: req.user || null });
 });
 
-server.use(function(err, req, res){
+server.use(auth.isLoggedIn({required: false}), function(err, req, res){
 	console.log(err.stack);
 	res.status(500);
-	res.render('500', { title: '500', flash: flash(req) });
+	res.render('500', { title: '500', flash: flash(req), user: req.user || null });
 });
 
 server.listen(port, function() {

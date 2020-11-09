@@ -68,3 +68,6 @@ We can link posts to categories and remove links when required. Added categories
 
 ## 20th of October 2020
 Started a large-ish code clean up. Mainly moving code that would be repeated to functions.
+
+## 9th of November 2020
+After the clean up, we finally hava a working frontpage and categories. You can view posts easily as the user and such. With some styling and filling out left only.

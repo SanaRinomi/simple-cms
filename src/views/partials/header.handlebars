@@ -1,0 +1,11 @@
+<a href="/category">Categories</a>
+<a href="/posts">Posts</a>
+
+{{#if user}}
+{{#if user.is_admin}}<a href="/admin">Admin Panel</a>{{/if}}
+<a href="/me">Profile</a>
+<a href="/logout">Logout</a>
+{{else}}
+<a href="/login">Login</a>
+<a href="/register">Register</a>
+{{/if}}

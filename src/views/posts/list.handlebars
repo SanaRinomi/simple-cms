@@ -1,13 +1,19 @@
 <article>
     <header>
-        <h2>Users</h2>
+        <h2>{{page.title}}</h2>
+        {{#if description}}<p>{{description}}</p>{{/if}}
     </header>
+{{#if page.posts}}
 {{#forEach page.posts}}
     <a href="{{url}}">
         <section style="display: flex; flex-direction: row;">
-            <img src="{{thumbnail.url}}" alt="{{thumbnail.description}}" height="100" width="100" style="padding: 5px;">
-            <h4 style="padding: 5px;">{{title}}</h4>
+            {{#if thumbnail}}<img src="{{thumbnail.url}}" alt="{{thumbnail.description}}" height="100" width="100" style="padding: 5px;">{{/if}}
+            <div>
+                <h4 style="padding: 5px;">{{title}}</h4>
+                {{#if description}}<p>{{description}}</p>{{/if}}
+            </div>
         </section>
     </a>
 {{/forEach}}
+{{/if}}
 </article>

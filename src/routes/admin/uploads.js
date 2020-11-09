@@ -10,11 +10,11 @@ router.get("/uploads/", async (req, res) => {
         const linked = await PostUpload.getLinked("posts", v.id);
         return {title: v.title, id: v.id, url: `/upload/${v.path}`, description: v.description, linked: linked.success}
     })) : null;
-    res.render("admin/uploads", {page: {title: "Uploads - Admin", posts: uploads, scripts: ["/js/uploadsManage.js"]}, website, flash: flash(req)});
+    res.render("admin/uploads", {page: {title: "Uploads - Admin", posts: uploads, scripts: ["/js/uploadsManage.js"]}, website, flash: flash(req), user: req.user || null});
 });
 
 router.get("/upload", (req, res) => {
-    res.render("admin/upload", {page: {title: "Admin"}, website, flash: flash(req)});
+    res.render("admin/upload", {page: {title: "Admin"}, website, flash: flash(req), user: req.user || null});
 });
 
 module.exports = router;

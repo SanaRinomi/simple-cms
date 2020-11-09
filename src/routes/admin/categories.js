@@ -14,7 +14,7 @@ router.get("/categories/", async (req, res) => {
         categories = [json];
     }
 
-    res.render("admin/categories", {page: {title: "Categories - Admin", posts: categories, scripts: ["/js/categoryManage.js"]}, website, flash: flash(req)});
+    res.render("admin/categories", {page: {title: "Categories - Admin", posts: categories, scripts: ["/js/categoryManage.js"]}, website, flash: flash(req), user: req.user || null});
 });
 
 router.get("/categories/:slug", async (req, res, next) => {
@@ -35,7 +35,7 @@ router.get("/categories/:slug", async (req, res, next) => {
         }
 
         console.log(allPosts);
-        res.render("admin/category", {page: {title: `${category.data.name} - Category - Admin`, scripts: ["/js/categoryDetails.js"]}, website, flash: flash(req), post: category.data, posts, allPosts});
+        res.render("admin/category", {page: {title: `${category.data.name} - Category - Admin`, scripts: ["/js/categoryDetails.js"]}, website, flash: flash(req), post: category.data, posts, allPosts, user: req.user || null});
     }
 });
 

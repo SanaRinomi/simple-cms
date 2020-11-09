@@ -10,7 +10,7 @@ router.get("/posts/", async (req, res) => {
     const dbPosts = await Posts.getAll(["title", "slug", "thumbnail"]);
     const posts = dbPosts.success ? dbPosts.data.map(v => {return {title: v.title, thumbnail: v.thumbnail, url: `/posts/${v.slug}`, slug: v.slug}}) : null;
 
-    res.render("admin/posts", {page: {title: "Posts - Admin", posts, scripts: ["/js/postManage.js"]}, website, flash: flash(req)});
+    res.render("admin/posts", {page: {title: "Posts - Admin", posts, scripts: ["/js/postManage.js"]}, website, flash: flash(req), user: req.user || null});
 });
 
 router.get("/posts/:slug", async (req, res, next) => {
@@ -26,7 +26,7 @@ router.get("/posts/:slug", async (req, res, next) => {
         
         const fetched = await fetchPostJSON(post.data);
         
-        res.render("admin/post", {page: {title: `${post.data.title} - Admin`, scripts: ["https://cdnjs.cloudflare.com/ajax/libs/markdown-it/12.0.1/markdown-it.min.js", "/js/dropzone.min.js", "/js/postGen.js"]}, website, flash: flash(req), post: fetched, categories, authors});
+        res.render("admin/post", {page: {title: `${post.data.title} - Admin`, scripts: ["https://cdnjs.cloudflare.com/ajax/libs/markdown-it/12.0.1/markdown-it.min.js", "/js/dropzone.min.js", "/js/postGen.js"]}, website, flash: flash(req), post: fetched, categories, authors, user: req.user || null});
     }
 });
 

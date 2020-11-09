@@ -33,7 +33,7 @@ router.post("/register",[
 ], auth.register({redirectFailure: "/"}), async (req, res) => {
     const defaults = await Uploads.getUserDefault();
 
-    const profile = await Profiles.insert({user_id: req.user.id, slug: req.user.username.toLowerCase().split(" ").join("_"), pfp: defaults.pfp ? defaults.pfp.id : 1, pfc: defaults.pfc ? defaults.pfc.id : 1});
+    const profile = await Profiles.insert({user_id: req.user.id, slug: req.body.username.toLowerCase().split(" ").join("_"), pfp: defaults.pfp ? defaults.pfp.id : 1, pfc: defaults.pfc ? defaults.pfc.id : 1});
     res.redirect("/me");
 });
 

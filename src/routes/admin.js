@@ -16,7 +16,7 @@ router.use(auth.isLoggedIn({redirectFailure: "/"}), (req, res, next) => {
 })
 
 router.get("/", (req, res) => {
-    res.render("admin/index", {page: {title: "Admin"}, website, flash: flash(req)});
+    res.render("admin/index", {page: {title: "Admin"}, website, flash: flash(req), user: req.user || null});
 });
 
 router.use(require("./admin/posts"));

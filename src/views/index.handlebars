@@ -1,5 +1,18 @@
-<h1>This is index</h1>
-
-<a href="/login">Go to Login</a>
-<a href="/register">Go to Register</a>
-<a href="/logout">Logout</a>
+<article>
+    <header>
+        <h3>All Posts</h3>
+    </header>
+{{#if page.posts}}
+{{#forEach page.posts}}
+    <a href="{{url}}">
+        <section style="display: flex; flex-direction: row;">
+            {{#if thumbnail}}<img src="{{thumbnail.url}}" alt="{{thumbnail.description}}" height="100" width="100" style="padding: 5px;">{{/if}}
+            <div>
+                <h4 style="padding: 5px;">{{title}}</h4>
+                {{#if description}}<p>{{description}}</p>{{/if}}
+            </div>
+        </section>
+    </a>
+{{/forEach}}
+{{/if}}
+</article>

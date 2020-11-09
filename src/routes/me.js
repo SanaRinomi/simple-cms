@@ -3,7 +3,7 @@ const {website} = require("../controllers/constants");
 const auth = require("../controllers/localAuth");
 const flash = require("smol-flash");
 const router = express.Router();
-const {Profiles} = require("../controllers/dbMain");
+const {Profiles, Users} = require("../controllers/dbMain");
 const { body, validationResult } = require('express-validator');
 const validator = (require('validator')).default;
 
@@ -87,6 +87,20 @@ async (req, res) => {
 
     const dbRes = await Profiles.upsert({user_id: req.session.user_id}, dbQuery)
     res.json(dbRes);
+});
+
+router.delete("/account", async (req, res, next) => {
+    const logout = await auth.logOut({inFunc: true})(req, res, next);
+    console.log(logout)
+    if(logout.success) {
+        const profile = await Profiles.del(req.profile.id);
+        const user = await Users.del(req.user.id);
+
+        if(user) {
+            flash(req, {error: false, description: "User deleted"});
+            res.redirect("/");
+        } else next(new Error("User failed to delete"));
+    } else {console.error(logout.error); next(new Error("Logout failed"))};
 });
 
 module.exports = router;

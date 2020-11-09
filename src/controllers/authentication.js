@@ -53,23 +53,31 @@ class Authentication {
 
     logOut(config = {
         redirectSuccess: null,
-        redirectFailure: null
+        redirectFailure: null,
+        inFunc: false
     }) {
         return async (req, res, next) => {
             const _config = new Configuration(config, res, req, next);
             const id = req.session.user_id;
+            
             if(id) {
                 if(this._logout) {
                     let lres = await this._logout(req, res, _config, this);
                     if(lres instanceof Error) {
-                        _config.error(lres);
-                        return;
+                        if(!config.inFunc) _config.error(lres);
+                        return config.inFunc ? {success: false, error: lres} : undefined;
                     }
-                } else delete req.session.user_id;
+                }
+                
+                delete req.session.user_id;
             }
 
-            flash(req, {error: false, description: "Logout successful!"})
-            _config.success();
+            if(config.inFunc) {
+                return {success: true};
+            } else{
+                flash(req, {error: false, description: "Logout successful!"})
+                _config.success();
+            }
         }
     }
 
@@ -88,7 +96,7 @@ class Authentication {
                         _config.error(req.user);
                         return;
                     }
-                } else req.user.id = null;
+                } else req.session.user_id = null;
                 _config.success();
             } else {
                 _config.error(Error("Not authorized"));

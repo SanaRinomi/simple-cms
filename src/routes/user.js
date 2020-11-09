@@ -9,6 +9,8 @@ const {Profiles, Users, Uploads} = require("../controllers/dbMain");
 //     res.redirect("/me");
 // });
 
+router.use(auth.isLoggedIn({required: false}));
+
 router.get("/", async (req, res) => {
     const users = await Users.getAll(["username", "id"]);
     const profiles = await Promise.all(users.data.map(async user => {
@@ -28,7 +30,7 @@ router.get("/", async (req, res) => {
             return null;
     }));
 
-    res.render("posts/list", {page: {title: "Users", posts: profiles}, website, flash: flash(req)});
+    res.render("posts/list", {page: {title: "Users", posts: profiles}, user: req.user || null, website, flash: flash(req)});
 });
 
 router.get("/:slug", async (req, res) => {
