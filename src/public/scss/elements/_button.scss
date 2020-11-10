@@ -1,0 +1,36 @@
+.e-button {
+    font-size: $text-size;
+    color: $text-colour;
+    margin-left: 5px;
+    margin-right: 5px;
+    padding: 10px 20px;
+    border: solid black 2px;
+    width: fit-content;
+    background-color: #EAD0F0;
+    border-radius: 20px;
+
+    &:active, &:visited, &:link {
+        color: $text-colour;
+    }
+
+    // Modifiers
+    &.e-button--highlight {
+        background-color: #F5D178;
+    }
+
+    &.e-button--clear {
+        background: none;
+    }
+
+    &.e-button--small {
+        padding: 5px 10px;
+        border-radius: 10px;
+    }
+    
+    &.e-button--large {
+        font-size: $h5-size;
+        padding: 15px 30px;
+        border-radius: 30px;
+    }
+
+}

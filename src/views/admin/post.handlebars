@@ -1,9 +1,11 @@
 <h3>Post Contents</h3>
-<article id="post-container">
+<article id="post-container" class="section">
 {{#if post.content}}{{#forEach post.content}}
     <section class="loaded" section-type="{{{type}}}" {{#if id}}content-id="{{{id}}}"{{/if}}>{{{data}}}</section>
 {{/forEach}}{{/if}}
 </article>
+
+<div class="divider"></div>
 
 <form action="" id="section-select">
     <select name="section-type" id="s-sect-type">
@@ -13,9 +15,9 @@
     <button type="submit" id="s-create">Create</button>
 </form>
 
-<article id="post-details">
+<article id="post-details" class="section">
     <h3>Post Details</h3>
-    <table>
+    <table class="e-table">
         <colgroup>
             <col style="font-weight: bold;">
             <col span="2">
@@ -63,5 +65,7 @@
     </table>
 </article>
 
-<h3>Post Delete</h3>
-<button id="button-delete">Delete</button>
+<div class="section">
+    <h3>Post Delete</h3>
+    <button id="button-delete">Delete</button>
+</div>

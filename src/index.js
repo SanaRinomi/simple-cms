@@ -73,9 +73,6 @@ server.use("/user", require("./routes/user"));
 // Upload router - Manages uploading files to the server.
 server.use("/upload", require("./routes/upload"));
 
-// Test router - For testing functionality. Comment out in prod.
-server.use("/test", require("./routes/tests"));
-
 server.use(auth.isLoggedIn({required: false}), function(req, res){
     const page = {
         title: "404"

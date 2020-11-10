@@ -1,0 +1,182 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    max-width: 100%;
+    width: 100vw;
+    min-height: calc(100vh - #{$content-min-height});
+    background-color: $body-background;
+}
+
+h1, h2, h3, h4 {
+    font-family: $title-font;
+}
+
+h1, h2 {
+    font-weight: lighter;
+}
+
+h5, h6, p, a, span {
+    font-family: $regular-font;
+    font-size: $text-size;
+}
+
+h4, h5, h6 {
+    color: $text-colour-weak;
+}
+
+h1 {
+    font-size: $h1-size;
+    
+    & a {
+        font-size: $h1-size;
+    }
+}
+
+h2 {
+    font-size: $h2-size;
+    
+    & a {
+        font-size: $h2-size;
+    }
+}
+
+h3 {
+    font-size: $h3-size;
+    
+    & a {
+        font-size: $h3-size;
+    }
+}
+
+h4 {
+    font-size: $h4-size;
+
+    & a {
+        font-size: $h4-size;
+    }
+}
+
+h5 {
+    font-size: $h5-size;
+
+    & a {
+        font-size: $h5-size;
+    }
+}
+
+h6 {
+    font-size: $h6-size;
+
+    & a {
+        font-size: $h6-size;
+    }
+}
+
+a, a:active, a:visited, a:link {
+    text-decoration: none;
+    color: $text-colour-link;
+
+    &.normal {
+        color: black;
+    }
+}
+
+a:hover {
+    color: $text-colour-link-hover;
+
+    &.normal {
+        color: black;
+    }
+}
+
+code {
+    font-family: $code-font;
+    font-size: $text-size;
+}
+
+// .code {
+//     margin: 3px 5px;
+//     padding: 3px 5px;
+//     background-color: $code-background;
+//     border: thin black solid;
+//     border-radius: 4px;
+// }
+
+.center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.hidden {
+    display: none;
+    visibility: hidden;
+}
+
+.bkg-green { background-color: green;}
+.bkg-red { background-color: red;}
+
+@media screen {
+    .screen-reader {
+        display: none;
+        visibility: hidden;
+    }
+}
+
+@media only screen and (min-width: 3839px) {
+    h1 {
+        font-size: $h1-size*2;
+
+        & a {
+            font-size: $h1-size*2;
+        }
+    }
+    
+    h2 {
+        font-size: $h2-size*2;
+
+        & a {
+            font-size: $h2-size*2;
+        }
+    }
+    
+    h3 {
+        font-size: $h3-size*2;
+
+        & a {
+            font-size: $h3-size*2;
+        }
+    }
+    
+    h4 {
+        font-size: $h4-size*2;
+
+        & a {
+            font-size: $h4-size*2;
+        }
+    }
+    
+    h5 {
+        font-size: $h5-size*2;
+
+        & a {
+            font-size: $h5-size*2;
+        }
+    }
+    
+    h6 {
+        font-size: $h6-size*2;
+
+        & a {
+            font-size: $h6-size*2;
+        }
+    }
+
+    p, a, a:active, a:visited, a:link, code {
+        font-size: $text-size*2;
+    }
+}

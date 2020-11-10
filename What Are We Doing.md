@@ -71,3 +71,8 @@ Started a large-ish code clean up. Mainly moving code that would be repeated to 
 
 ## 9th of November 2020
 After the clean up, we finally hava a working frontpage and categories. You can view posts easily as the user and such. With some styling and filling out left only.
+
+## 10th of November 2020
+And that's a wrap! The CMS works and has some simple styling when it comes to user interaction and what's left is form styling, Admin panel styling and basically some polish!
+
+You guys can try it and mess around with it as much as your heart desired and I hope you enjoyed seeing how a simple CMS can be made in the span of a month!

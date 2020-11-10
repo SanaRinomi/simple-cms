@@ -1,0 +1,42 @@
+#l-header {
+    width: 100vw;
+    max-width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: $header-height;
+    box-shadow: 0 0 3px #282817;
+    background-color: $header-background;
+
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    flex-wrap: wrap;
+
+    & > .l-header--list {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        flex-grow: 1;
+    }
+
+    a {
+        margin: 1vh 1vw;
+        padding: 1vh 1vw;
+        font-size: $h5-size;
+    }
+
+    .icon {
+        height: ($header-height/4)*3;
+        width: ($header-height/4)*3;
+        object-fit: contain;
+    }
+}
+
+@media only screen and (max-width: 540px) {
+    #l-header a {
+        margin: 1vh 1vw;
+        padding: 1vh 1vw;
+        font-size: $h6-size;
+    }
+}

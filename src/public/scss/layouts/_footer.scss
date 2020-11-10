@@ -1,0 +1,49 @@
+@use "sass:color";
+
+#l-footer {
+    width: 100vw;
+    max-width: 100%;
+    height: $header-height*2;
+    max-height: max-content;
+    box-shadow: 0 0 3px #282817;
+    background-color: color.scale($header-background, $lightness: -70%);
+    color: $body-background;
+
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+
+    & > .l-footer--list {
+        background-color: color.scale($header-background, $lightness: -70%);
+        display: flex;
+        justify-content: space-around;
+        flex-direction: column;
+        align-items: center;
+        max-height: max-content;
+    }
+
+    a, a:active, a:visited, a:link {
+        margin: 1vh 1vw;
+        padding: 1vh 1vw;
+        color: color.scale($text-colour-link, $lightness: 70%);
+
+        &.normal {
+            color: $body-background;
+        }
+    }
+    
+    a:hover {
+        color: color.scale($text-colour-link-hover, $lightness: 70%);
+    
+        &.normal {
+            color: $body-background;
+        }
+    }
+
+    .icon {
+        height: ($header-height/4)*3;
+        width: ($header-height/4)*3;
+        object-fit: contain;
+    }
+}

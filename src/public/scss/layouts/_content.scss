@@ -1,0 +1,55 @@
+@use "sass:color";
+
+#l-content {
+    min-height: calc(100vh - #{$content-min-height});
+    margin: $content-min-height $content-margin-width 0;
+
+    .list-container {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+
+        $list-height: 20vh;
+
+        .listing {
+            width: 100%;
+            height: $list-height;
+            margin-top: 2vh;
+
+            & > a {
+                width: 100%;
+                height: $list-height;
+                margin: 0;
+                padding: 0;
+                display: flex;
+                justify-content: flex-start;
+                align-items: center;
+
+                background-color: color.scale($body-background, $lightness: -15%, $alpha: -50%);
+
+                .listing-thumbnail {
+                    width: $list-height;
+                    height: $list-height;
+                }
+
+                .listing-text {
+                    flex-grow: 1;
+                    height: min-content;
+                    padding-left: 2vw;
+                }
+            }
+        }
+    }
+
+    // Components
+    .section {
+        &:not(:last-child), & > *:not(:last-child) {
+            padding-bottom: 10px;
+        }
+
+        &:last-child, & > *:last-child {
+            margin-bottom: 20px;
+        }
+    }
+}
+

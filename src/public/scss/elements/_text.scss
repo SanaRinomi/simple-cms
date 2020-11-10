@@ -1,0 +1,24 @@
+.e-text {
+    @include element;
+
+    // Modifiers
+    &.e-text--center {
+        text-align: center;
+    }
+    
+    &.e-text--nopad {
+        padding: 0;
+    }
+
+    &.e-text--squish {
+        padding-left: 10%;
+        padding-right: 10%;
+    }
+
+    &.e-text--enfasize {
+        text-align: center;
+        font-weight: bold;
+        padding-top: 15px;
+        padding-bottom: 15px;
+    }
+}

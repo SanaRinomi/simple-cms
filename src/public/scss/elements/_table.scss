@@ -1,0 +1,38 @@
+.e-table {
+    margin-left: 5%;
+    margin-right: 5%;
+    border-collapse: collapse;
+    border: none;
+    width: 90%;
+    overflow-x: scroll;
+    display: block;
+
+    caption {
+        font-size: $h5-size;
+        font-family: $title-font;
+        text-align: center;
+    }
+
+    th, td {
+        border-bottom: 1px solid $divider-colour;
+        padding: 1vh 2vw;
+    }
+
+    th {
+        text-align: left;
+        font-weight: bold;
+        font-family: $title-font;
+    }
+
+    td {
+        font-family: $regular-font;
+    }
+
+    tbody > tr:nth-child(2n) {
+        background-color: $table-background-even;
+    }
+
+    tbody > tr:nth-child(2n+1) {
+        background-color: $table-background-odd;
+    }
+}

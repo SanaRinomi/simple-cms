@@ -1,0 +1,20 @@
+<div class="l-footer--list l-footer--left">
+    <ul>
+        <li><a href="/category">All Categories</a></li>
+        <li><a href="/posts">All Posts</a></li>
+        {{#if user}}
+        {{#if user.is_admin}}<li><a href="/admin">Admin Panel</a></li>{{/if}}
+        <li><a href="/me">Profile</a></li>
+        <li><a href="/me/settings">User Settings</a></li>
+        <li><a href="/logout">Logout</a></li>
+        {{else}}
+        <li><a href="/login">Login</a></li>
+        <li><a href="/register">Register</a></li>
+        {{/if}}
+    </ul>
+</div>
+
+<div class="l-footer--list">
+    <span><a href="https://github.com/SanaRinomi/simple-cms">Simple CMS</a> by <a href="https://github.com/SanaRinomi">Sana Rinomi</a></span>
+    <span><a href="https://github.com/SanaRinomi">Sana Rinomi</a> &copy; 2020</span>
+</div>

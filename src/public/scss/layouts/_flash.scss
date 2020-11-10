@@ -1,0 +1,33 @@
+#l-flash {
+    width: 100vw;
+    max-width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: $header-height;
+    background-color: $header-background;
+    z-index: 100;
+
+    display: flex;
+    flex-direction: row;
+    align-content: center;
+    justify-content: center;
+
+    &.error {
+        color: whitesmoke;
+        background-color: rgb(252, 89, 67);
+    }
+
+    & .close-elem {
+        padding-left: 20px;
+        padding-right: 20px;
+        font-size: $h3-size;
+        color: black;
+    }
+}
+
+@media only screen and (max-width: 540px) {
+    #l-flash {
+        overflow-x: scroll;
+    }
+}

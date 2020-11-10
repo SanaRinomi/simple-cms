@@ -1,0 +1,17 @@
+<ul class="list-container">
+    {{#if page.posts}}
+    {{#forEach page.posts}}
+        <li class="listing">
+            <a href="{{url}}">
+                {{#if thumbnail}}
+                    <img src="{{thumbnail.url}}" class="listing-thumbnail">
+                {{/if}}
+                <div class="listing-text">
+                    <h4>{{title}}</h4>
+                    {{#if description}}<p>{{description}}</p>{{/if}}
+                </div>
+            </a>
+        </li>
+    {{/forEach}}
+    {{/if}}
+</ul>

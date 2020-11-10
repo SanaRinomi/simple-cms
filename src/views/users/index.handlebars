@@ -1,18 +1,23 @@
+{{#if user}}<div class="section">
+    <a href="/me/settings"><h3>Your Settings</h3></a>
+</div>{{/if}}
+
+
 <article>
-    <header>
-        {{#if profile.pfp}}<img src="/upload/id/{{profile.pfp}}" alt="{{#if profile.public_name}}{{profile.public_name}}{{else}}{{user.username}}{{/if}}'s Profile Picture'" height="250" width="250">{{/if}}
-        <h2>{{#if profile.public_name}}{{profile.public_name}}{{else}}{{user.username}}{{/if}}</h2>
+    <header class="section">
+        {{#if profile.pfp}}<img src="/upload/id/{{profile.pfp}}" alt="{{#if profile.public_name}}{{profile.public_name}}{{else}}{{user.username}}{{/if}}'s Profile Picture'" class="e-image e-image--icon">{{/if}}
+        <h1>{{#if profile.public_name}}{{profile.public_name}}{{else}}{{user.username}}{{/if}}</h1>
     </header>
-    <section id="l-description">
+    <section id="description section">
         {{#markdown}}{{profile.description}}{{/markdown}}
-    </section id="l-u-details">
-    <section>
+    </section>
+    <section class="section">
         <ul>
             <li><b>Gender:</b> {{#if profile.gender}}{{profile.gender.name}} ({{#eq profile.gender.pronouns "1"}}He/Him{{else}}{{#eq profile.gender.pronouns "2"}}She/Her{{else}}They/Them{{/eq}}{{/eq}}){{else}}Not set (They/Them){{/if}}</li>
             <li><b>Birthday:</b> {{#if profile.birthday}}{{date profile.birthday "DD MMMM"}}{{else}}None Set{{/if}}</li>
         </ul>
     </section>
-    {{#if profile.links}}<section>
+    {{#if profile.links}}<section class="section">
         <ul>{{#forEach profile.links}}
             <li><a href="{{url}}">{{name}}</a></li>{{/forEach}}
         </ul>

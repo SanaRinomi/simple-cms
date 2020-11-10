@@ -1,11 +1,16 @@
-<a href="/category">Categories</a>
-<a href="/posts">Posts</a>
+<div class="l-header--left l-header--list">
+    <a href="/" class="normal">Home</a>
+    <a href="/category" class="normal">Categories</a>
+    <a href="/posts" class="normal">Posts</a>
+</div>
 
-{{#if user}}
-{{#if user.is_admin}}<a href="/admin">Admin Panel</a>{{/if}}
-<a href="/me">Profile</a>
-<a href="/logout">Logout</a>
-{{else}}
-<a href="/login">Login</a>
-<a href="/register">Register</a>
-{{/if}}
+<div class="l-header--right l-header--list">
+    {{#if user}}
+    {{#if user.is_admin}}<a href="/admin" class="normal">Admin Panel</a>{{/if}}
+    <a href="/me" class="normal">Profile</a>
+    <a href="/logout" class="normal">Logout</a>
+    {{else}}
+    <a href="/login" class="normal">Login</a>
+    <a href="/register" class="normal">Register</a>
+    {{/if}}
+</div>
